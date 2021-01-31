@@ -60,7 +60,7 @@ fixed directory structure
 │   │   └── tst.py
 │   └── workflows
 │       └── classroom.yml
-├── assignments
+├── Assignments
 │   ├── ...
 │   └── hw03
 │       └── solution.yml
