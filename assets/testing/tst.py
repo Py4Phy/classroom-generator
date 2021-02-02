@@ -6,6 +6,12 @@ from io import StringIO
 import subprocess
 import re
 
+# Make sure to run with Python 3 (on GitHub Actions, the default Python `python` is
+# currently 'executable': '/usr/bin/python', 'version': '2.7.17 (default, Sep 30 2020, 13:38:04) \n[GCC 7.5.0]'}
+# see https://github.com/actions/virtual-environments/blob/ubuntu18/20210123.1/images/linux/Ubuntu1804-README.md
+# and https://github.com/actions/virtual-environments/issues/1816
+PYTHON = "python3"
+
 def assert_variable(name, value, reference, check_type=False):
     if check_type:
         # check type (exact, not isinstance)
@@ -65,7 +71,7 @@ def _test_variable_with_input(name, input_values, reference, mod, check_type=Fal
 
 def _test_output(filename, reference, input_values=None):
     input_values = "\n".join([str(s) for s in input_values]) + "\n" if input_values is not None else None
-    output = subprocess.check_output(["python", filename], input=input_values, universal_newlines=True)
+    output = subprocess.check_output([PYTHON, filename], input=input_values, universal_newlines=True)
     m = re.search(reference, output, flags=re.MULTILINE)
-    assert m, f"'python {filename}' did not produce output matching regular expression\n\n{reference}\n\n"
+    assert m, f"'{PYTHON} {filename}': output\n\n{output}\n\ndid not match regular expression\n\n{reference}\n\n"
 
