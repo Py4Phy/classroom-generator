@@ -1,6 +1,6 @@
 # Homeworks Test Templates
 
-Homework tests are generated from templates and a `solution.yml` file
+Homework tests are generated from templates and a `generate.yml` file
 that contains the individual tests with points. The
 `generate_tests.py` script then creates
 
@@ -42,7 +42,7 @@ Manually copy any starter code.
 Tests are generated in the BUILD directory, typically "BUILD/HWxx"; we
 will refer to it as `$BUILD`.
 
-1. cd hw working directory with `solution.yml` 
+1. cd hw working directory with `generate.yml` 
 2. run `generate_tests.py`, which creates `$BUILD`
 
 
@@ -66,7 +66,7 @@ All necessary files are copied into the `$BUILD` directory.
 ## Solutions
 
 Keep solutions in a `solution` directory here for reference. They are
-not used anywhere. The `solution.yml` file needs to either contain the
+not used anywhere. The `generate.yml` file needs to either contain the
 correct reference values or the custom tests need to contain the code
 to check for correctness.
 
@@ -98,7 +98,7 @@ fixed directory structure
 ├── Assignments
 │   ├── ...
 │   └── hw03
-│       └── solution.yml
+│       └── generate.yml
 └── bin
     ├── ...
     └── generate_tests.py

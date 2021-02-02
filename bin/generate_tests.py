@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# generate tests from solution.yml
+# generate tests from generate.yml
 
 import string
 import pathlib
@@ -26,7 +26,7 @@ import json
 # ├── Assignments
 # │   ├── ...
 # │   └── hw03
-# │       └── solution.yml
+# │       └── generate.yml
 # └── bin
 #     ├── ...
 #     └── generate_tests.py
@@ -60,7 +60,7 @@ autograder = {
 
 def choose_template(problem):
     if 'test' in problem:
-        # custom test under ./tests (from where solution.yml sits)
+        # custom test under ./tests (from where generate.yml sits)
         return "tests" / pathlib.Path(problem['test'])
 
     if 'variable' not in problem:
@@ -87,7 +87,7 @@ def create_init_file(directory, comment):
 
 if __name__ == "__main__":
 
-    filename = "solution.yml"
+    filename = "generate.yml"
 
     solution = yaml.load(open(filename))
     problemset = solution['problemset']
