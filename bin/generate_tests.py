@@ -85,7 +85,9 @@ def create_init_file(directory, comment):
     return initfile
 
 
-def create_subproblem(subproblem, problem_dir, metadata=None,
+def create_subproblem(subproblem, problem_dir,
+                      build_dir,
+                      metadata=None,
                       pytest_args="--tb=line"):
     """Build tests and metadata for a single subproblem.
 
@@ -94,7 +96,11 @@ def create_subproblem(subproblem, problem_dir, metadata=None,
     subproblem : dict
                  data structure for an entry in *problems.items*
     problem_dir: pathlib.Path
-                 directory for the problem under ``tests``
+                 directory for the problem, relative to the root
+                 (should include ``tests/...``); needs to be relative
+                 to `build_dir`
+    build_dir : pathlib.Path
+                 directory where files are build (typically build_dir/)
     metadata : dict
                  data for the whole problem (assignment, problem, filename)
     pytest_args : str
@@ -117,7 +123,9 @@ def create_subproblem(subproblem, problem_dir, metadata=None,
     subs.update(metadata)
     template = choose_template(subs)
 
-    testfile = problem_dir / f"test_{subproblem['name']}.py"
+    testfilename = f"test_{subproblem['name']}.py"
+    testfile = build_dir / problem_dir / testfilename
+
     if isinstance(template, string.Template):
         print(f".. Using standard template ")
         t = template.substitute(subs)
@@ -135,9 +143,9 @@ def create_subproblem(subproblem, problem_dir, metadata=None,
     ag = autograder.copy()
     ag['name'] = f"Test: Problem {problem['problem']} / {subproblem['name']}"
     ag['points'] = subproblem['points']
-    ag['run'] = f"pytest {pytest_args} {'tests' / testfile}"
+    ag['run'] = f"pytest {pytest_args} {problem_dir / testfilename}"
 
-    print(f"++ Created entry for autograder.")
+    print(f"++ Created entry for autograder: {ag['name']}: {ag['run']}")
 
     return ag, used_templates
 
@@ -167,24 +175,25 @@ if __name__ == "__main__":
     problemset = solution['problemset']
 
     build_dir = pathlib.Path("BUILD") / make_safe_filename(problemset['name'])
-    test_dir = build_dir / "tests"
+    build_test_dir = build_dir / "tests"
+    test_dir = pathlib.Path("tests")  # relative to the build root from where pytest is invoked
 
     print(f"assignment: {problemset['name']}")
     print(f"BUILD_DIR: {build_dir}")
-    print(f"test_dir: {test_dir}")
+    print(f"test_dir: {build_test_dir}")
 
     build_dir.mkdir(parents=True, exist_ok=True)
-    test_dir.mkdir(parents=True, exist_ok=True)
+    build_test_dir.mkdir(parents=True, exist_ok=True)
 
     # custom global assets
     for filename in problemset.get('test_assets', []):
         # find test assets under tests/
         asset_path = "tests" / pathlib.Path(filename)
-        shutil.copy(asset_path, test_dir)
-        print(f"+ Copied {asset_path} --> {test_dir}")
+        shutil.copy(asset_path, build_test_dir)
+        print(f"+ Copied {asset_path} --> {build_test_dir}")
 
     # make it a package for relative imports
-    create_init_file(test_dir, f"tests for {problemset['name']}")
+    create_init_file(build_test_dir, f"tests for {problemset['name']}")
 
     # If we use any of the templates then we also need to copy other
     # assets.
@@ -203,22 +212,25 @@ if __name__ == "__main__":
                     'filename': problem['filename'],
                     }
         problem_dir = test_dir / pathlib.Path(f"problem_{problem['problem']}")
-        problem_dir.mkdir(exist_ok=True)
-        print(f"+ Created {problem_dir}/")
+        build_problem_dir = build_dir / problem_dir
+        build_problem_dir.mkdir(exist_ok=True)
+        print(f"+ Created {build_problem_dir}/")
 
         # make it a package for relative imports
-        create_init_file(problem_dir,
+        create_init_file(build_problem_dir,
                          f"tests for {problemset['name']}: Problem {problem['problem']}")
 
         for subproblem in problem['items']:
-            ag, sub_used_templates = create_subproblem(subproblem, problem_dir, metadata=metadata)
+            ag, sub_used_templates = create_subproblem(subproblem, problem_dir,
+                                                       build_dir,
+                                                       metadata=metadata)
             tests_list.append(ag)
             used_templates = used_templates or sub_used_templates
             points_total += subproblem['points']
 
     # copy standard test assets if needed
     if used_templates:
-        copy_template_dependencies(test_dir)
+        copy_template_dependencies(build_test_dir)
 
     create_autograder_json(tests_list, build_dir)
 
