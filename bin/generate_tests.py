@@ -41,6 +41,8 @@ templates = {'variable':
              string.Template((templatedir / '_test_multi_variables.template.py').read_text()),
              'variable_with_input':
              string.Template((templatedir / '_test_variable_with_input.template.py').read_text()),
+             'output':
+             string.Template((templatedir / '_test_output.template.py').read_text()),
              }
 
 template_dependencies = [testing_assets_dir / "tst.py"]
@@ -62,13 +64,15 @@ def choose_template(problem):
     if 'test' in problem:
         # custom test under ./tests (from where generate.yml sits)
         return "tests" / pathlib.Path(problem['test'])
+    elif 'output' in problem:
+        return templates['output']
 
     if 'variable' not in problem:
         raise ValueError("Only templates with variable checks implemented")
 
-    if 'input_values' in problem:
+    if problem.get('input_values', None) is not None:
         return templates['variable_with_input']
-    if isinstance(problem['variable'], list):
+    elif isinstance(problem['variable'], list):
         # multiple comparisons needed
         return templates['multi_variables']
     # simple: just one variable
@@ -120,6 +124,7 @@ def create_subproblem(subproblem, problem_dir,
     print(f"== subproblem: {subproblem['name']}  points: {subproblem['points']}")
     subs = subproblem.copy()
     subs.setdefault('check_type', False)
+    subs.setdefault('input_values', None)
     subs.update(metadata)
     template = choose_template(subs)
 
@@ -140,6 +145,7 @@ def create_subproblem(subproblem, problem_dir,
     print(f"++ Created {testfile}... [{subproblem['points']}]")
 
     # generate entry for autograding.json
+    # NOTE: output and input are always "" because we use our own output checker
     ag = autograder.copy()
     ag['name'] = f"Test: Problem {problem['problem']} / {subproblem['name']}"
     ag['points'] = subproblem['points']

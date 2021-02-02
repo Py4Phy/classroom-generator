@@ -14,6 +14,7 @@ gets its own test file, point value, and entry in `autograding.yml`.
 At the moment the following is supported:
 - template tests for checking fixed variables
 - template tests for running a script with `input()` from stdin that sets variables
+- template test for comparing output against regular expression
 - custom test files
 
 
