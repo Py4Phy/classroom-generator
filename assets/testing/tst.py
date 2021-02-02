@@ -64,6 +64,7 @@ def _test_variable_with_input(name, input_values, reference, mod, check_type=Fal
     assert_variable(name, value, reference, check_type=check_type)
 
 def _test_output(filename, reference, input_values=None):
+    input_values = "\n".join([str(s) for s in input_values]) + "\n" if input_values is not None else None
     output = subprocess.check_output(["python", filename], input=input_values, universal_newlines=True)
     m = re.search(reference, output, flags=re.MULTILINE)
     assert m, f"'python {filename}' did not produce output matching regular expression\n\n{reference}\n\n"
