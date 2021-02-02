@@ -80,20 +80,91 @@ def make_safe_filename(filename, keepcharacters=('.', '-', '_')):
 
 def create_init_file(directory, comment):
     initfile = directory / pathlib.Path("__init__.py")
-    with initfile.open("w") as out:
-        out.write(f"# {comment}\n")
+    initfile.write_text(f"# {comment}\n")
     print(f"+ Created {initfile}")
     return initfile
+
+
+def create_subproblem(subproblem, problem_dir, metadata=None,
+                      pytest_args="--tb=line"):
+    """Build tests and metadata for a single subproblem.
+
+    Parameters
+    ----------
+    subproblem : dict
+                 data structure for an entry in *problems.items*
+    problem_dir: pathlib.Path
+                 directory for the problem under ``tests``
+    metadata : dict
+                 data for the whole problem (assignment, problem, filename)
+    pytest_args : str
+                 additional arguments for ``pytest ... tests/problem_x/test_name.py``
+
+    Returns
+    -------
+    ag : dict
+         entry for ``autograding.yml`` for this test
+    used_templates : bool
+         ``True`` if any of the test templates were used, ``False`` if only custom
+         test files were copied
+
+    """
+    metadata = metadata if metadata is not None else {'assignment': "HOMEWORK", 'problem': 0, 'filename': None}
+
+    print(f"== subproblem: {subproblem['name']}  points: {subproblem['points']}")
+    subs = subproblem.copy()
+    subs.setdefault('check_type', False)
+    subs.update(metadata)
+    template = choose_template(subs)
+
+    testfile = problem_dir / f"test_{subproblem['name']}.py"
+    if isinstance(template, string.Template):
+        print(f".. Using standard template ")
+        t = template.substitute(subs)
+        testfile.write_text(t)
+        used_templates = True
+    else:
+        # custom file: just copy
+        print(f".. Copy custom test {template}")
+        shutil.copy(template, testfile)
+        used_templates = False
+
+    print(f"++ Created {testfile}... [{subproblem['points']}]")
+
+    # generate entry for autograding.json
+    ag = autograder.copy()
+    ag['name'] = f"Test: Problem {problem['problem']} / {subproblem['name']}"
+    ag['points'] = subproblem['points']
+    ag['run'] = f"pytest {pytest_args} {'tests' / testfile}"
+
+    print(f"++ Created entry for autograder.")
+
+    return ag, used_templates
+
+def copy_template_dependencies(test_dir):
+    """copy everything in :attr:`template_dependencies` to `test_dir`"""
+
+    for asset_path in template_dependencies:
+        shutil.copy(asset_path, test_dir)
+        print(f"+ Copied {asset_path} --> {test_dir} (dependency)")
+
+
+def create_autograder_json(tests_list, directory):
+    """write 'autograding.json' in `directory` from `tests_list` list of dicts"""
+
+    ag_json = directory / pathlib.Path("autograding.json")
+    ag_json.write_text(json.dumps({'tests': tests_list}))
+
+    print(f"+ Created '{ag_json}'")
+    return ag_json
+
 
 if __name__ == "__main__":
 
     filename = "generate.yml"
 
-    solution = yaml.load(open(filename))
+    solution = yaml.load(open(filename), Loader=yaml.FullLoader)
     problemset = solution['problemset']
-
-    tests_list = []  # becomes "tests": test_list in autograding.json
-    points_total = 0
 
     build_dir = pathlib.Path("BUILD") / make_safe_filename(problemset['name'])
     test_dir = build_dir / "tests"
@@ -119,8 +190,14 @@ if __name__ == "__main__":
     # assets.
     used_templates = False
 
+    # becomes "tests": test_list in autograding.json
+    tests_list = []
+
+    # running total of points
+    points_total = 0
+
     for problem in problemset['problems']:
-        print(f"= problem: {problem['problem']} in '{problem['filename']}'")
+        print(f"= problem: {problem['problem']} in file '{problem['filename']}'")
         metadata = {'assignment': problemset['name'],
                     'problem': problem['problem'],
                     'filename': problem['filename'],
@@ -133,48 +210,16 @@ if __name__ == "__main__":
         create_init_file(problem_dir,
                          f"tests for {problemset['name']}: Problem {problem['problem']}")
 
-
         for subproblem in problem['items']:
-            print(f"== subproblem: {subproblem['name']}  points: {subproblem['points']}")
-            subs = subproblem.copy()
-            subs.setdefault('check_type', False)
-            subs.update(metadata)
-            template = choose_template(subs)
-
-            testfile = problem_dir / f"test_{subproblem['name']}.py"
-            if isinstance(template, string.Template):
-                print(f".. Using standard template ")
-                used_templates = True
-                t = template.substitute(subs)
-                #print(t)
-                with open(testfile, 'w') as out:
-                    out.write(t)
-            else:
-                # custom file: just copy
-                print(f".. Copy custom test {template}")
-                shutil.copy(template, testfile)
-
-            print(f"++ Created {testfile}... [{subproblem['points']}]")
-
-            # generate entry for autograding.json
-            ag = autograder.copy()
-            ag['name'] = f"Test: Problem {problem['problem']} / {subproblem['name']}"
-            ag['points'] = subproblem['points']
-            ag['run'] = f"pytest --tb=line {'tests' / testfile}"
-
+            ag, sub_used_templates = create_subproblem(subproblem, problem_dir, metadata=metadata)
             tests_list.append(ag)
-            print(f"++ Created entry for autograder.")
-
+            used_templates = used_templates or sub_used_templates
             points_total += subproblem['points']
 
     # copy standard test assets if needed
     if used_templates:
-        for asset_path in template_dependencies:
-            shutil.copy(asset_path, test_dir)
-            print(f"+ Copied {asset_path} --> {test_dir} (dependency)")
+        copy_template_dependencies(test_dir)
 
-    # write autograder json
-    ag_json = build_dir / pathlib.Path("autograding.json")
-    ag_json.write_text(json.dumps({'tests': tests_list}))
+    create_autograder_json(tests_list, build_dir)
 
-    print(f"+ Created '{ag_json}'... [TOTAL {points_total}]")
+    print(f"* TOTAL POINTS      [{points_total}]")
