@@ -24,6 +24,6 @@ test -d tests && rsync -avP --exclude="__pycache__" --exclude="*~" tests $BUILD
 mkdir -p $BUILD/.github/{workflows,classroom}
 cp -v $ASSETS/workflows/classroom.yml $BUILD/.github/workflows
 mv $BUILD/autograding.json $BUILD/.github/classroom/
-cp -v $ASSETS/students.gitignore $BUILD
+cp -v $ASSETS/students.gitignore $BUILD/.gitignore
 
 (cd $BUILD && test -d .git ||  { git init && git add -A . && git commit -m "initialized assignment"; } && { git add -A . && git commit -m "updated assignment"; })
