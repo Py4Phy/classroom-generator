@@ -92,7 +92,7 @@ def create_init_file(directory, comment):
 def create_subproblem(subproblem, problem_dir,
                       build_dir,
                       metadata=None,
-                      pytest_args="--tb=line"):
+                      pytest_args=None):
     """Build tests and metadata for a single subproblem.
 
     Parameters
@@ -109,6 +109,7 @@ def create_subproblem(subproblem, problem_dir,
                  data for the whole problem (assignment, problem, filename)
     pytest_args : str
                  additional arguments for ``pytest ... tests/problem_x/test_name.py``
+                 (if not provided in subproblem, the default ``--tb=line`` is used)
 
     Returns
     -------
@@ -125,6 +126,7 @@ def create_subproblem(subproblem, problem_dir,
     subs = subproblem.copy()
     subs.setdefault('check_type', False)
     subs.setdefault('input_values', None)
+    subs.setdefault('pytest_args', pytest_args if pytest_args is not None else "--tb=line")
     subs.update(metadata)
     template = choose_template(subs)
 
@@ -149,7 +151,7 @@ def create_subproblem(subproblem, problem_dir,
     ag = autograder.copy()
     ag['name'] = f"Test: Problem {problem['problem']} / {subproblem['name']}"
     ag['points'] = subproblem['points']
-    ag['run'] = f"pytest {pytest_args} {problem_dir / testfilename}"
+    ag['run'] = f"pytest {subs['pytest_args']} {problem_dir / testfilename}"
 
     print(f"++ Created entry for autograder: {ag['name']}: {ag['run']}")
 
