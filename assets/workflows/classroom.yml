@@ -19,6 +19,8 @@ jobs:
       - uses: education/autograding@v1
         id: autograder
         continue-on-error: true
+        env:
+           MPLBACKEND: agg
 
       # make dir for badges
       - name: badges branch and make dir

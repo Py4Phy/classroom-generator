@@ -250,6 +250,8 @@ if __name__ == "__main__":
             ag, sub_used_templates = create_subproblem(subproblem, problem_dir,
                                                        build_dir,
                                                        metadata=metadata)
+            # special setup (define per problem but needs to be specified per test for autograder)
+            ag['setup'] = problem.get('setup', ag['setup'])
             tests_list.append(ag)
             used_templates = used_templates or sub_used_templates
             points_total += subproblem['points']
