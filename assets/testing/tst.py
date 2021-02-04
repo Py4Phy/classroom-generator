@@ -75,3 +75,19 @@ def _test_output(filename, reference, input_values=None):
     m = re.search(reference, output, flags=re.MULTILINE)
     assert m, f"'{PYTHON} {filename}': output\n\n{output}\n\ndid not match regular expression\n\n{reference}\n\n"
 
+def _test_function(funcname, args, kwargs, reference, mod, check_type=False):
+    mod = pathlib.Path(mod)
+    try:
+        module = importlib.import_module(mod.stem)
+    except ImportError:
+        raise AssertionError(f"File '{mod}' could not be imported.")
+    try:
+        func = getattr(module, funcname)
+    except AttributeError:
+        raise AssertionError(f"File '{mod}' does not contain function '{funcname}'.")
+
+    value = func(*args, **kwargs)
+
+    assert_variable(f"{funcname}(*{args}, **{kwargs})", value, reference, check_type=check_type)
+
+

@@ -43,6 +43,8 @@ templates = {'variable':
              string.Template((templatedir / '_test_variable_with_input.template.py').read_text()),
              'output':
              string.Template((templatedir / '_test_output.template.py').read_text()),
+             'function':
+             string.Template((templatedir / '_test_function.template.py').read_text()),
              }
 
 template_dependencies = [testing_assets_dir / "tst.py"]
@@ -66,6 +68,8 @@ def choose_template(problem):
         return "tests" / pathlib.Path(problem['test'])
     elif 'output' in problem:
         return templates['output']
+    elif 'function' in problem:
+        return templates['function']
 
     if 'variable' not in problem:
         raise ValueError("Only templates with variable checks implemented")
@@ -128,6 +132,20 @@ def create_subproblem(subproblem, problem_dir,
     subs.setdefault('input_values', None)
     subs.setdefault('pytest_args', pytest_args if pytest_args is not None else "--tb=line")
     subs.update(metadata)
+    # function template
+    if subs.get('args', None) or subs.get('kwargs', None):
+        # ensure equal length of args and kwargs lists for parametrized tests
+        args = subs.get('args', None)
+        kwargs = subs.get('kwargs', None)
+        if isinstance(args, list) and not kwargs:
+            subs['kwargs'] = len(args) * [{}]
+        elif isinstance(kwargs, list) and not args:
+            subs['args'] = len(kwargs) * [()]
+        else:
+            # check
+            if len(args) != len(kwargs):
+                raise ValueError(f"Function args and kwargs must be lists of same length: |{args}| != |{kwargs}|")
+
     template = choose_template(subs)
 
     testfilename = f"test_{subproblem['name']}.py"
