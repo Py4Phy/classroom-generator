@@ -137,8 +137,8 @@ problemset:
     - name: area_kwargs
       points: 4
       function: area
-      args:  [[2, 4], [2, 4], [1, 1]
-      kwargs: [{}, {'scale': 2}, {'scale': 0.5}], 
+      args:  [[2, 4], [2, 4], [1, 1]]
+      kwargs: [{}, {'scale': 2}, {'scale': 0.5}] 
       reference: [8, 16, 0.5]      
 ``` 
           
