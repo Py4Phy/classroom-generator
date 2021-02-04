@@ -20,7 +20,8 @@ echo "## Finalizing repo"
 
 cp -v README.md $BUILD
 cp -v *.py $BUILD
-test -d tests && rsync -avP --exclude="__pycache__" --exclude="*~" tests $BUILD
+# Should not need to copy tests: use test_assets: ["conftest.py", ...] at top.
+#test -d tests && rsync -avP --exclude="__pycache__" --exclude="*~" tests $BUILD
 mkdir -p $BUILD/.github/{workflows,classroom}
 cp -v $ASSETS/workflows/classroom.yml $BUILD/.github/workflows
 mv $BUILD/autograding.json $BUILD/.github/classroom/
