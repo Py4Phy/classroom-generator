@@ -6,11 +6,14 @@ from io import StringIO
 import subprocess
 import re
 
-# Make sure to run with Python 3 (on GitHub Actions, the default Python `python` is
-# currently 'executable': '/usr/bin/python', 'version': '2.7.17 (default, Sep 30 2020, 13:38:04) \n[GCC 7.5.0]'}
-# see https://github.com/actions/virtual-environments/blob/ubuntu18/20210123.1/images/linux/Ubuntu1804-README.md
-# and https://github.com/actions/virtual-environments/issues/1816
-PYTHON = "python3"
+# Make sure to run with Python 3: Always run pytest under Python 3.
+PYTHON = sys.executable
+
+def assert_python3():
+    if sys.version_info.major < 3:
+        if sys.version_info.major < 6:
+            raise AssertionError(("The python version {v[0]}.{v[1]}.{v[2]} "
+                                  "must be >= 3.6").format(v=sys.version_info))
 
 def assert_variable(name, value, reference, check_type=False):
     if check_type:
