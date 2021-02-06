@@ -10,10 +10,9 @@ import re
 PYTHON = sys.executable
 
 def assert_python3():
-    if sys.version_info.major < 3:
-        if sys.version_info.major < 6:
-            raise AssertionError(("The python version {v[0]}.{v[1]}.{v[2]} "
-                                  "must be >= 3.6").format(v=sys.version_info))
+    v = sys.version_info
+    if v.major < 3 or (v.major == 3 and v.minor < 6):
+        raise AssertionError(f"The python version {v[0]}.{v[1]}.{v[2]} must be >= 3.6")
 
 def assert_variable(name, value, reference, check_type=False):
     if check_type:
