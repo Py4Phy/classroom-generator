@@ -18,7 +18,7 @@ test -d "$BUILD" || die "no dir $BUILD"
 
 echo "## Finalizing repo"
 
-cp -v README.md assignment*.md $BUILD
+cp -v README.md assignment*.md assignment*.pdf $BUILD
 cp -v *.py $BUILD
 # Should not need to copy tests: use test_assets: ["conftest.py", ...] at top.
 #test -d tests && rsync -avP --exclude="__pycache__" --exclude="*~" tests $BUILD

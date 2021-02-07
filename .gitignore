@@ -1,9 +1,15 @@
 *~
 \#*
 __pycache__
+.pytest_cache
 *.py[cod]
 .ipynb_checkpoints
 .DS_Store
 BUILD
 **/Solution/tests
+_minted-*
+auto
+*.aux
+*.log
+*.out
 
