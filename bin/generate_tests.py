@@ -187,7 +187,7 @@ def create_autograder_json(tests_list, directory):
     """write 'autograding.json' in `directory` from `tests_list` list of dicts"""
 
     ag_json = directory / pathlib.Path("autograding.json")
-    ag_json.write_text(json.dumps({'tests': tests_list}))
+    ag_json.write_text(json.dumps({'tests': tests_list}, indent=2))
 
     print(f"+ Created '{ag_json}'")
     return ag_json
