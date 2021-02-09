@@ -16,6 +16,7 @@ def test_python3():
 def test_${name}():
     return _test_output(FILENAME,
                         r"""${output}""",
-                        input_values=${input_values})
+                        input_values=${input_values},
+                        regex=${regex})
 
 

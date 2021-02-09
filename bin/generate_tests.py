@@ -132,7 +132,14 @@ def create_subproblem(subproblem, problem_dir,
     subs['name'] = make_safe_filename(subproblem['name'])
     subs.setdefault('check_type', False)
     subs.setdefault('input_values', None)
-    subs.setdefault('pytest_args', pytest_args if pytest_args is not None else "--tb=line")
+    subs.setdefault('regex', True)
+    if pytest_args is None:
+        if subs.get('output', None):
+            # show more debug output with all the pattern
+            pytest_args = "--tb=short"
+        else:
+            pytest_args = "--tb=line"
+    subs.setdefault('pytest_args', pytest_args)
     subs.update(metadata)
 
     if subs['name'] != subproblem['name']:
