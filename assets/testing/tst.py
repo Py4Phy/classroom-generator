@@ -25,7 +25,17 @@ def assert_variable(name, value, reference, check_type=False):
     except TypeError:
         assert value == reference, f"{name}={value} is not correct, should have been '{reference}'."
 
-
+def get_attribute(name, mod):
+    mod = pathlib.Path(mod)
+    try:
+        module = importlib.import_module(mod.stem)
+    except ImportError:
+        raise AssertionError(f"File '{mod}' could not be imported.")
+    try:
+        attribute = getattr(module, name)
+    except AttributeError:
+        raise AssertionError(f"File '{mod}' does not contain variable '{name}'.")
+    return attribute
 
 def _test_file(p):
     p = pathlib.Path(p)
@@ -34,16 +44,7 @@ def _test_file(p):
 
 
 def _test_variable(name, reference, mod, check_type=False):
-    mod = pathlib.Path(mod)
-    try:
-        module = importlib.import_module(mod.stem)
-    except ImportError:
-        raise AssertionError(f"File '{mod}' could not be imported.")
-    try:
-        value = getattr(module, name)
-    except AttributeError:
-        raise AssertionError(f"File '{mod}' does not contain variable '{name}'.")
-
+    value = get_attribute(name, mod)
     assert_variable(name, value, reference, check_type=check_type)
 
 
@@ -83,16 +84,7 @@ def _test_output(filename, reference, input_values=None, regex=True):
     assert m, f"'{PYTHON} {filename}': output\n\n{output}\n\ndid not {match_pattern}\n\n{reference}\n\n"
 
 def _test_function(funcname, args, kwargs, reference, mod, check_type=False):
-    mod = pathlib.Path(mod)
-    try:
-        module = importlib.import_module(mod.stem)
-    except ImportError:
-        raise AssertionError(f"File '{mod}' could not be imported.")
-    try:
-        func = getattr(module, funcname)
-    except AttributeError:
-        raise AssertionError(f"File '{mod}' does not contain function '{funcname}'.")
-
+    func = get_attribute(funcname, mod)
     value = func(*args, **kwargs)
 
     assert_variable(f"{funcname}(*{args}, **{kwargs})", value, reference, check_type=check_type)
