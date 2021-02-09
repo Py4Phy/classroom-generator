@@ -84,6 +84,7 @@ def choose_template(problem):
 
 def make_safe_filename(filename, keepcharacters=('.', '-', '_')):
     # based on https://stackoverflow.com/a/7406369
+    filename = filename.replace(" ", "_")
     return "".join(c for c in filename if c.isalnum() or c in keepcharacters).strip()
 
 def create_init_file(directory, comment):
@@ -128,10 +129,15 @@ def create_subproblem(subproblem, problem_dir,
 
     print(f"== subproblem: {subproblem['name']}  points: {subproblem['points']}")
     subs = subproblem.copy()
+    subs['name'] = make_safe_filename(subproblem['name'])
     subs.setdefault('check_type', False)
     subs.setdefault('input_values', None)
     subs.setdefault('pytest_args', pytest_args if pytest_args is not None else "--tb=line")
     subs.update(metadata)
+
+    if subs['name'] != subproblem['name']:
+        print(f"** NOTE: using '{subs['name']}' as testname instead of '{subproblem['name']}'")
+
     # function template
     if subs.get('args', None) or subs.get('kwargs', None):
         # ensure equal length of args and kwargs lists for parametrized tests
@@ -148,7 +154,7 @@ def create_subproblem(subproblem, problem_dir,
 
     template = choose_template(subs)
 
-    testfilename = f"test_{subproblem['name']}.py"
+    testfilename = f"test_{subs['name']}.py"
     testfile = build_dir / problem_dir / testfilename
 
     if isinstance(template, string.Template):
