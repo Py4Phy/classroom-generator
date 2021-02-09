@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # ASSIGNMENT: $assignment
 # PROBLEM NUMBER: $problem
 
