@@ -78,7 +78,7 @@ def _test_variable_with_input(name, input_values, reference, mod, check_type=Fal
 
 def _test_output(filename, reference, input_values=None, regex=True):
     input_values = "\n".join([str(s) for s in input_values]) + "\n" if input_values is not None else None
-    output = subprocess.check_output([PYTHON, filename], input=input_values, universal_newlines=True)
+    output = subprocess.check_output([PYTHON, filename], input=input_values, universal_newlines=True, encoding="utf-8")
     if regex:
         m = re.search(reference, output, flags=re.MULTILINE)
         match_pattern = "match regular expression pattern"
