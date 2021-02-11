@@ -39,7 +39,7 @@ Currently, the `BUILD_all.sh` script only copies `*.py` files at the top level.
 
 ### Generating tests
 
-Tests are generated in the BUILD directory, typically "BUILD/<name>"
+Tests are generated in the BUILD directory, typically `BUILD/<name>`
 where `<name>` is generated from the assignment title in
 **problemset.name** in the `generate.yml` file (after making the name
 "shell"-safe); we will refer to it as `$BUILD`.
