@@ -1,4 +1,4 @@
-# Homeworks Test Templates
+# Test generator for GitHub Classroom autograding
 
 Homework tests are generated from templates and a `generate.yml` file
 that contains the individual tests with points. The
