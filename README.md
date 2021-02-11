@@ -7,8 +7,8 @@ that contains the individual tests with points. The
 - the appropriate tests themselves
 - the `autograding.json` configuration for the `.github/workflows/classroom/autograding.json`
 
-The `solutions.yml` file indicates problems with their individual
-tests. For each problem, a subdirectory is made under tests. Each test
+The `generate.yml` file contains data for problems with their individual
+tests. For each problem, a subdirectory is made under `tests/`. Each test
 gets its own test file, point value, and entry in `autograding.yml`.
 
 At the moment the following is supported:
@@ -21,12 +21,12 @@ At the moment the following is supported:
 
 ## Usage
 
-Primitive at the moment... will create the new HW in a directory
-`BUILD/HWxx`, which needs to be manually copied as necessary.
+Primitive at the moment... will create the new HW in a subdirectory
+`BUILD/<name>` with a repository that can pushed to new repo on GitHub.
 
 ### Assignment
 
-Create the assignment.md.
+Create the `assignment.md` with instructions for students
 
 Make sure to include the points banner.
 
@@ -34,40 +34,48 @@ Make sure to include the points banner.
 
 Create any starter code.
 
+Currently, the `BUILD_all.sh` script only copies `*.py` files at the top level.
+
 
 ### Generating tests
 
-Tests are generated in the BUILD directory, typically "BUILD/HWxx"; we
-will refer to it as `$BUILD`.
+Tests are generated in the BUILD directory, typically "BUILD/<name>"
+where `<name>` is generated from the assignment title in
+**problemset.name** in the `generate.yml` file (after making the name
+"shell"-safe); we will refer to it as `$BUILD`.
 
-1. cd hw working directory with `generate.yml` 
-2. run `generate_tests.py`, which creates `$BUILD`
+1. cd to the top directory that contains `generate.yml` 
+2. run `generate_tests.py`, which creates `$BUILD` with the tests
 
-See below for notes on `generate.yml`
-
-
-### Tests infrastructure
+See [below](#input-file) for notes on `generate.yml`
 
 All necessary files are copied into the `$BUILD` directory. 
 
 ### Final assembly
 
-Can use the
+Use the
 
-    bin/BUILD_all BUILD/<name>`
+    ../bin/BUILD_all BUILD/<name>
 
 script, which does the following:
 
-- copy assignment.md to `$BUILD` and symlink as README.md
+- copy `assignment.md` to `$BUILD` and symlink as `README.md`
 - copy assignment assets to `$BUILD`
 - `mkdir $BUILD/.github/{workflows,classroom}`
-- copy classroom.json `cp $ASSETS/workflows/classroom.yml $BUILD/.github/workflows` (does not change)
-- copy autograding.json `cp autograding.json $BUILD/.github/classroom` (is specific for this assignment)
-- create .gitignore
-- create a  *template* repository for the HWxx,  `cd $BUILD && git init && git add . && git commit`, push to the repo
+- copy `classroom.json` (static): `cp $ASSETS/workflows/classroom.yml
+  $BUILD/.github/workflows` (does not change)
+- copy `autograding.json` (created): `cp autograding.json
+  $BUILD/.github/classroom` (is specific for this assignment)
+- create `.gitignore`
+- create a *template* repository for the HWxx (which is updated on
+  further runs of `BUILD_all.sh`); push the repo to a bare GitHub repo
+  to crete an assignment template that can be used with GitHub
+  Classroom.
 
 
-## generate.yml
+## Input file
+
+The input file is always called **generate.yml**.
 
 Look at existing ones for examples. Example with common usage:
 
@@ -203,7 +211,7 @@ problemset:
   parameter set.
 
   The list of **reference** values must have the same length as the
-  **args** and **kwargs** lists.
+  **args** and **kwargs** lists, with one reference for each input.
 
   Only one of **args** or **kwargs** need to be provided; the other is
   generated with empty content if necessary.
@@ -221,8 +229,9 @@ to check for correctness.
 
 ## TODO
 - add commandline processing to script
-- put all files in the template (assignment.md, classroom.yml) and copy -- see `BUILD_all.sh`
 - documentation
+- separate Assignments and Participation into separate repository
+- add license and make classroom-generator public
 
 
 ## Layout
@@ -247,6 +256,6 @@ fixed directory structure
 │   └── hw03
 │       └── generate.yml
 └── bin
-    ├── ...
+    ├── BUILD_all.sh
     └── generate_tests.py
 ```
