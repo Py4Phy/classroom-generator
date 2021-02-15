@@ -134,8 +134,8 @@ def create_subproblem(subproblem, problem_dir,
     subs.setdefault('input_values', None)
     subs.setdefault('regex', True)
     if pytest_args is None:
-        if subs.get('output', None):
-            # show more debug output with all the pattern
+        if subs.get('output', None) or subs.get('test', None):
+            # show more debug output with all the pattern or custom tests
             pytest_args = "--tb=short"
         else:
             pytest_args = "--tb=line"
