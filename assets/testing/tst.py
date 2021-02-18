@@ -26,7 +26,7 @@ def assert_variable(name, value, reference, check_type=False):
     except TypeError:
         assert value == reference, f"{name}={value} is not correct, should have been '{reference}'."
 
-def get_attribute(name, mod):
+def import_file(mod):
     mod = pathlib.Path(mod)
     if not mod.exists():
         raise AssertionError(f"File {mod} is missing from {mod.cwd()}")
@@ -35,6 +35,10 @@ def get_attribute(name, mod):
     except ImportError as err:
         raise AssertionError(f"File '{mod}' could not be imported in {mod.cwd()}."
                              f"\n{err.__class__.__name__}: {err}")
+    return module
+
+def get_attribute(name, mod):
+    module = import_file(mod)
     try:
         attribute = getattr(module, name)
     except AttributeError:
