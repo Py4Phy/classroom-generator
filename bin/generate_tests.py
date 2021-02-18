@@ -82,7 +82,7 @@ def choose_template(problem):
     # simple: just one variable
     return templates['variable']
 
-def make_safe_filename(filename, keepcharacters=('.', '-', '_')):
+def make_safe_filename(filename, keepcharacters=('_')):
     # based on https://stackoverflow.com/a/7406369
     filename = filename.replace(" ", "_")
     return "".join(c for c in filename if c.isalnum() or c in keepcharacters).strip()
