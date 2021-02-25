@@ -21,6 +21,7 @@ echo "## Finalizing repo"
 cp -v README.md assignment*.md assignment*.pdf tex/*.pdf $BUILD
 cp -v *.csv *.txt $BUILD
 cp -v *.py $BUILD
+cp -v *.ipynb $BUILD
 # Should not need to copy tests: use test_assets: ["conftest.py", ...] at top.
 #test -d tests && rsync -avP --exclude="__pycache__" --exclude="*~" tests $BUILD
 mkdir -p $BUILD/.github/{workflows,classroom}
