@@ -235,8 +235,9 @@ if __name__ == "__main__":
     create_init_file(build_test_dir, f"tests for {problemset['name']}")
 
     # If we use any of the templates then we also need to copy other
-    # assets.
-    used_templates = False
+    # assets. (Can be set explicitly but will automatically set to True
+    # later if any templates are being used implicitly)
+    used_templates = problemset.get('used_templates', False)
 
     # becomes "tests": test_list in autograding.json
     tests_list = []
@@ -250,7 +251,8 @@ if __name__ == "__main__":
                     'problem': problem['problem'],
                     'filename': problem['filename'],
                     }
-        problem_dir = test_dir / pathlib.Path(f"problem_{problem['problem']}")
+        problem_dir = test_dir / pathlib.Path(
+            make_safe_filename(f"problem_{problem['problem']}"))
         build_problem_dir = build_dir / problem_dir
         build_problem_dir.mkdir(exist_ok=True)
         print(f"+ Created {build_problem_dir}/")
