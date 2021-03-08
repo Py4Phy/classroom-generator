@@ -50,6 +50,22 @@ def _test_file(p):
     if not p.exists():
         raise AssertionError(f"Solution file '{p}' is missing.")
 
+def _test_imagefile(p):
+    p = pathlib.Path(p)
+    _test_file(p)
+    # test loading as image
+    try:
+        import matplotlib.image as mpimg
+    except ImportError:
+        # matplotlib was not installed
+        import warnings
+        warnings.warn("This test requires matplotlib to be installed. Will AUTOMATICALLY PASS.")
+        return
+    try:
+        img = mpimg.imread(str(p))
+    except OSError as err:
+        raise AssertionError(f"Failed to read image '{p}', error:\n"
+                             f"{err.__class__.__name__}: {err}")
 
 def _test_variable(name, reference, mod, check_type=False):
     value = get_attribute(name, mod)

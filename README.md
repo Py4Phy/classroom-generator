@@ -15,6 +15,7 @@ At the moment the following is supported:
 - template tests for checking fixed variables
 - template tests for running a script with `input()` from stdin that sets variables
 - template test for comparing output against regular expression
+- template test for checking existence of an image file
 - template test for function evaluation (parametrized, always provide args/kwargs/references as a list of lists or list of dicts)
 - custom test files
 
@@ -149,6 +150,18 @@ problemset:
       args:  [[2, 4], [2, 4], [1, 1]]
       kwargs: [{}, {'scale': 2}, {'scale': 0.5}] 
       reference: [8, 16, 0.5]      
+  - problem: 4
+    title: Plot functions
+    filename: myfuncs.py
+    items:
+    - name: heaviside
+      points: 4
+      function: heaviside
+      args:  [[0], [-1.e+100], [42.1], [1.2e-24], [10], [-10]]
+      reference: [0.5, 0, 1., 1., 1., 0]
+    - name: plot
+	  points: 1
+	  imagefilename: "heaviside.png"
 ``` 
           
 ### General notes
@@ -217,6 +230,10 @@ problemset:
 * **input_values** key: input to be read from standard input. Each
   element of the list is turned into a string and supplied with a
   newline.
+
+* **imagefilename**: name of a file that should have been submitted;
+  the test only checks that the file exists and that it can be loaded
+  as an image with `matplotlib.image.imread()`.
 
 * **function:** key: functions are *always tested with parametrized
   fixtures*, i.e., arguments **args**/**kwargs** must *always* be
