@@ -159,6 +159,8 @@ problemset:
       function: heaviside
       args:  [[0], [-1.e+100], [42.1], [1.2e-24], [10], [-10]]
       reference: [0.5, 0, 1., 1., 1., 0]
+	  relative_tolerance: 1.e-6
+	  absolute_tolerance: 1.e-12
     - name: plot
 	  points: 1
 	  imagefilename: "heaviside.png"
@@ -248,6 +250,16 @@ problemset:
   Only one of **args** or **kwargs** need to be provided; the other is
   generated with empty content if necessary.
 
+* **relative_tolerance** and **absolute_tolerance**: set the tolerance
+  values `rel` and/or `abs` for
+  [pytest.approx()](https://docs.pytest.org/en/4.6.x/reference.html#pytest-approx)
+  for any test that checks for floating point numbers (**variable**
+  and **function**). By default they are set to `None` so that the
+  pytest defaults of `rel=1e-6` and `abs=1e-12` are used. Note that
+  only setting either **relative_tolerance** _or_
+  **absolute_tolerance** leads to different behavior of
+  `pytest.approx()`, as described in the docs. Leaving these values
+  unset should be fine in most cases.
 
 
 ## Solutions

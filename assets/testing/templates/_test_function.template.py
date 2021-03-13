@@ -19,4 +19,8 @@ def test_${name}(args, kwargs, reference):
                           kwargs,   # dict
                           reference,
                           FILENAME,
-                          check_type=${check_type})
+                          check_type=${check_type},
+                          rtol=${relative_tolerance},
+                          atol=${absolute_tolerance},
+                          )
+

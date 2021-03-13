@@ -135,6 +135,8 @@ def create_subproblem(subproblem, problem_dir,
     subs = subproblem.copy()
     subs['name'] = make_safe_filename(subproblem['name'])
     subs.setdefault('check_type', False)
+    subs.setdefault('relative_tolerance', None)  # use pytest.approx() defaults
+    subs.setdefault('absolute_tolerance', None)  # use pytest.approx() defaults
     subs.setdefault('input_values', None)
     subs.setdefault('regex', True)
     if pytest_args is None:

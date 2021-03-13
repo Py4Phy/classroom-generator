@@ -16,4 +16,8 @@ POINTS = ${points}
 def test_${name}(varname, reference):
     return _test_variable(varname, reference,
                           FILENAME,
-                          check_type=${check_type})
+                          check_type=${check_type},
+                          rtol=${relative_tolerance},
+                          atol=${absolute_tolerance},
+                          )
+

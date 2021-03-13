@@ -15,14 +15,22 @@ def assert_python3():
     if v.major < 3 or (v.major == 3 and v.minor < 6):
         raise AssertionError(f"The python version {v[0]}.{v[1]}.{v[2]} must be >= 3.6")
 
-def assert_variable(name, value, reference, check_type=False):
+def assert_variable(name, value, reference, check_type=False,
+                    rtol=None, atol=None):
+    # process tolerance
+    # remove kwargs set to `None` and let approx() decide
+    # (defaults are rtol=1e-6 and atol=1e-12
+    # https://docs.pytest.org/en/4.6.x/reference.html#pytest-approx); only setting one
+    # changes behavior, see docs.
+    tolerance = {name: tol for name, tol in (("abs", atol), ("rel", rtol)) if tol is not None}
+
     if check_type:
         # check type (exact, not isinstance)
         ref_type = type(reference)
         assert type(value) == ref_type, f"Data type of '{name}' is wrong, should be '{ref_type}'."
 
     try:
-        assert value == pytest.approx(reference), f"{name}={value} is not correct, should have been '{reference}'."
+        assert value == pytest.approx(reference, **tolerance), f"{name}={value} is not correct, should have been '{reference}'."
     except TypeError:
         assert value == reference, f"{name}={value} is not correct, should have been '{reference}'."
 
@@ -67,12 +75,12 @@ def _test_imagefile(p):
         raise AssertionError(f"Failed to read image '{p}', error:\n"
                              f"{err.__class__.__name__}: {err}")
 
-def _test_variable(name, reference, mod, check_type=False):
+def _test_variable(name, reference, mod, **kwargs):
     value = get_attribute(name, mod)
-    assert_variable(name, value, reference, check_type=check_type)
+    assert_variable(name, value, reference, **kwargs)
 
 
-def _test_variable_with_input(name, input_values, reference, mod, check_type=False):
+def _test_variable_with_input(name, input_values, reference, mod, **kwargs):
     mod = pathlib.Path(mod)
     if not mod.exists():
         raise AssertionError(f"File '{mod}' could not be found")
@@ -94,7 +102,7 @@ def _test_variable_with_input(name, input_values, reference, mod, check_type=Fal
     except KeyError:
         raise AssertionError(f"Solution file '{mod}' does not contain variable '{name}'.")
 
-    assert_variable(name, value, reference, check_type=check_type)
+    assert_variable(name, value, reference, **kwargs)
 
 def _test_output(filename, reference, input_values=None, regex=True):
     input_values = "\n".join([str(s) for s in input_values]) + "\n" if input_values is not None else None
@@ -107,10 +115,10 @@ def _test_output(filename, reference, input_values=None, regex=True):
         match_pattern = "contain text"
     assert m, f"'{PYTHON} {filename}': output\n\n{output}\n\ndid not {match_pattern}\n\n{reference}\n\n"
 
-def _test_function(funcname, args, kwargs, reference, mod, check_type=False):
+def _test_function(funcname, fargs, fkwargs, reference, mod, **kwargs):
     func = get_attribute(funcname, mod)
-    value = func(*args, **kwargs)
+    value = func(*fargs, **fkwargs)
 
-    assert_variable(f"{funcname}(*{args}, **{kwargs})", value, reference, check_type=check_type)
+    assert_variable(f"{funcname}(*{fargs}, **{fkwargs})", value, reference, **kwargs)
 
 
