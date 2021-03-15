@@ -7,6 +7,9 @@ from io import StringIO
 import subprocess
 import re
 
+import numpy as np
+import numpy.testing as nptst
+
 # Make sure to run with Python 3: Always run pytest under Python 3.
 PYTHON = sys.executable
 
@@ -23,12 +26,31 @@ def assert_variable(name, value, reference, check_type=False,
     # https://docs.pytest.org/en/4.6.x/reference.html#pytest-approx); only setting one
     # changes behavior, see docs.
     tolerance = {name: tol for name, tol in (("abs", atol), ("rel", rtol)) if tol is not None}
+    nptol = {name: tol for name, tol in (("atol", atol), ("rtol", rtol)) if tol is not None}
 
     if check_type:
         # check type (exact, not isinstance)
         ref_type = type(reference)
         assert type(value) == ref_type, f"Data type of '{name}' is wrong, should be '{ref_type}'."
 
+    # If the output is a numpy array or a tuple containing arrays then we test them with numpy:
+    # (rtol and atol work a bit differently from pytest.approx: It's like np.allclose(actual, desired, rtol, atol):
+    # It compares the difference between `actual` and `desired` to ``atol + rtol * abs(desired)``.
+    if isinstance(value, np.ndarray):
+        nptst.assert_allclose(value, reference,
+                              err_msg=f"{name}={value} is not correct, should have been '{reference}'.",
+                              **nptol)
+        return
+    elif isinstance(value, tuple):
+        if all([isinstance(elem, np.ndarray) for elem in value]):
+            for ix, (x, ref) in enumerate(zip(value, reference)):
+                nptst.assert_allclose(x, ref,
+                                      err_msg=f"{name}[{ix}]={x} is not correct, should have been '{ref}'.",
+                                      **nptol)
+            return
+        # not sure what to do with mixed tuples ... maybe pytest deals with them properly
+
+    # fall back with pytest
     try:
         assert value == pytest.approx(reference, **tolerance), f"{name}={value} is not correct, should have been '{reference}'."
     except TypeError:
