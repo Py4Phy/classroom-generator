@@ -51,15 +51,16 @@ templates = {'variable':
 
 template_dependencies = [testing_assets_dir / "tst.py"]
 
+# copy dict as a template, do not modify
 autograder = {
     "name": None,     # replace
-    "setup": "sudo -H pip3 install pytest",
+    "setup": "sudo -H pip3 install pytest",        # default environment
     "run": "pytest --tb=line tests/test_NAME.py",  # replace tests/test_NAME.py
     "input": "",
     "output": "",
     "comparison": "included",
     "timeout": 1,
-    "points": 3    # replace
+    "points": None    # replace
 }
 
 
@@ -100,6 +101,7 @@ def create_init_file(directory, comment):
 
 def create_subproblem(subproblem, problem_dir,
                       build_dir,
+                      setup_command=autograder['setup'],
                       metadata=None,
                       pytest_args=None):
     """Build tests and metadata for a single subproblem.
@@ -114,6 +116,9 @@ def create_subproblem(subproblem, problem_dir,
                  to `build_dir`
     build_dir : pathlib.Path
                  directory where files are build (typically build_dir/)
+    setup_command : str
+                 command for installing test environment; default is
+                 ``autograder['setup']``.
     metadata : dict
                  data for the whole problem (assignment, problem, filename)
     pytest_args : str
@@ -189,6 +194,7 @@ def create_subproblem(subproblem, problem_dir,
     ag['name'] = f"Test: Problem {problem['problem']} / {subproblem['name']}"
     ag['points'] = subproblem['points']
     ag['run'] = f"pytest {subs['pytest_args']} {problem_dir / testfilename}"
+    ag['setup'] = setup_command
 
     print(f"++ Created entry for autograder: {ag['name']}: {ag['run']}")
 
@@ -216,8 +222,8 @@ if __name__ == "__main__":
 
     filename = "generate.yml"
 
-    solution = yaml.load(open(filename), Loader=yaml.FullLoader)
-    problemset = solution['problemset']
+    cfg = yaml.load(open(filename), Loader=yaml.FullLoader)
+    problemset = cfg['problemset']
 
     build_dir = pathlib.Path("BUILD") / make_safe_filename(problemset['name'])
     build_test_dir = build_dir / "tests"
@@ -245,6 +251,9 @@ if __name__ == "__main__":
     # later if any templates are being used implicitly)
     used_templates = problemset.get('used_templates', False)
 
+    # default test environment
+    default_setup = problemset.get('setup', autograder['setup'])
+
     # becomes "tests": test_list in autograding.json
     tests_list = []
 
@@ -268,11 +277,11 @@ if __name__ == "__main__":
                          f"tests for {problemset['name']}: Problem {problem['problem']}")
 
         for subproblem in problem['items']:
+            # special setup (define per problem but needs to be specified per test for autograder)
             ag, sub_used_templates = create_subproblem(subproblem, problem_dir,
                                                        build_dir,
+                                                       setup_command=problem.get('setup', default_setup),
                                                        metadata=metadata)
-            # special setup (define per problem but needs to be specified per test for autograder)
-            ag['setup'] = problem.get('setup', ag['setup'])
             tests_list.append(ag)
             used_templates = used_templates or sub_used_templates
             points_total += subproblem['points']
