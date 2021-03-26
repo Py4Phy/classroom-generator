@@ -43,6 +43,8 @@ templates = {'variable':
              string.Template((templatedir / '_test_variable_with_input.template.py').read_text()),
              'output':
              string.Template((templatedir / '_test_output.template.py').read_text()),
+             'file':
+             string.Template((templatedir / '_test_file.template.py').read_text()),
              'imagefile':
              string.Template((templatedir / '_test_imagefile.template.py').read_text()),
              'function':
@@ -71,6 +73,8 @@ def choose_template(problem):
         return "tests" / pathlib.Path(problem['test'])
     elif 'output' in problem:
         return templates['output']
+    elif 'file' in problem:
+        return templates['file']
     elif 'imagefilename' in problem:
         return templates['imagefile']
     elif 'function' in problem:

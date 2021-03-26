@@ -16,6 +16,7 @@ At the moment the following is supported:
 - template tests for running a script with `input()` from stdin that sets variables
 - template test for comparing output against regular expression
 - template test for checking existence of an image file
+- template test for checking existence of a file
 - template test for function evaluation (parametrized, always provide args/kwargs/references as a list of lists or list of dicts)
 - custom test files
 
@@ -167,6 +168,10 @@ problemset:
     - name: plot
 	  points: 1
 	  imagefilename: "heaviside.png"
+    - name: discussion of plot
+	  points: 1
+	  file: "discussion.txt"
+	  
 ``` 
           
 ### General notes
@@ -242,6 +247,9 @@ problemset:
 * **input_values** key: input to be read from standard input. Each
   element of the list is turned into a string and supplied with a
   newline.
+
+* **file**: name of a file that should have been submitted;
+  the test only checks that the file exists.
 
 * **imagefilename**: name of a file that should have been submitted;
   the test only checks that the file exists and that it can be loaded
