@@ -17,8 +17,10 @@ At the moment the following is supported:
 - template test for comparing output against regular expression
 - template test for checking existence of an image file
 - template test for checking existence of a file
+- template test for multiline regular expression match for file content
 - template test for function evaluation (parametrized, always provide args/kwargs/references as a list of lists or list of dicts)
 - custom test files
+
 
 
 ## Usage
@@ -171,7 +173,14 @@ problemset:
     - name: discussion of plot
 	  points: 1
 	  file: "discussion.txt"
-	  
+  - problem: 4b
+    title: discussion
+	filename: discussion.txt
+    - name: mention energy conservation
+	  points: 1
+	  content: |
+	     \s*energy\s*conservation
+
 ``` 
           
 ### General notes
@@ -254,6 +263,9 @@ problemset:
 * **imagefilename**: name of a file that should have been submitted;
   the test only checks that the file exists and that it can be loaded
   as an image with `matplotlib.image.imread()`.
+  
+* **content**: multiline regular expression (like **output**) but
+  matches the *content* of **filename**.
 
 * **function:** key: functions are *always tested with parametrized
   fixtures*, i.e., arguments **args**/**kwargs** must *always* be

@@ -143,4 +143,17 @@ def _test_function(funcname, fargs, fkwargs, reference, mod, **kwargs):
 
     assert_variable(f"{funcname}(*{fargs}, **{fkwargs})", value, reference, **kwargs)
 
+def _test_filecontent(filename, reference, regex=True):
+    datafile = pathlib.Path(filename)
+    if not datafile.exists():
+        raise AssertionError(f"{datafile} is missing")
 
+    output = datafile.read_text()
+
+    if regex:
+        m = re.search(reference, output, flags=re.MULTILINE)
+        match_pattern = "match regular expression pattern"
+    else:
+        m = reference in output
+        match_pattern = "contain text"
+    assert m, f"'In file {filename}': output\n\n{output}\n\ndid not {match_pattern}\n\n{reference}\n\n"
