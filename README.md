@@ -73,7 +73,7 @@ script, which does the following:
 - create `.gitignore`
 - create a *template* repository for the HWxx (which is updated on
   further runs of `BUILD_all.sh`); push the repo to a bare GitHub repo
-  to crete an assignment template that can be used with GitHub
+  to create an assignment template that can be used with GitHub
   Classroom.
 
 
