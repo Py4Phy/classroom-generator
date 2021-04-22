@@ -85,7 +85,8 @@ def choose_template(problem):
         return templates['function']
 
     if 'variable' not in problem:
-        raise ValueError("Only templates with variable checks implemented")
+        raise ValueError(f"No template found. Not sure what to do with\n{problem}")
+    # everything else requires "variable" to be defined
 
     if problem.get('input_values', None) is not None:
         return templates['variable_with_input']
