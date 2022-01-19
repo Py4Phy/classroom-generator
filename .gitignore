@@ -1,6 +1,7 @@
 *~
 \#*
 __pycache__
+.cache
 .pytest_cache
 *.py[cod]
 .ipynb_checkpoints
@@ -10,6 +11,8 @@ BUILD
 _minted-*
 auto
 *.aux
+*.blg
+*.bbl
 *.log
 *.out
 *.cpt
