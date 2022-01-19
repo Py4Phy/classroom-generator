@@ -21,7 +21,8 @@ At the moment the following is supported:
 - template test for function evaluation (parametrized, always provide args/kwargs/references as a list of lists or list of dicts)
 - custom test files
 
-
+All code and files are made available under the terms of the [GNU
+General Public License v3](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 ## Usage
 
@@ -165,21 +166,21 @@ problemset:
       function: heaviside
       args:  [[0], [-1.e+100], [42.1], [1.2e-24], [10], [-10]]
       reference: [0.5, 0, 1., 1., 1., 0]
-	  relative_tolerance: 1.e-6
-	  absolute_tolerance: 1.e-12
+      relative_tolerance: 1.e-6
+      absolute_tolerance: 1.e-12
     - name: plot
-	  points: 1
-	  imagefilename: "heaviside.png"
+      points: 1
+      imagefilename: "heaviside.png"
     - name: discussion of plot
-	  points: 1
-	  file: "discussion.txt"
+      points: 1
+      file: "discussion.txt"
   - problem: 4b
     title: discussion
-	filename: discussion.txt
+    filename: discussion.txt
     - name: mention energy conservation
-	  points: 1
-	  content: |
-	     \s*energy\s*conservation
+      points: 1
+      content: |
+         \s*energy\s*conservation
 
 ``` 
           
