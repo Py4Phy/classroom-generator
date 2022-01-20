@@ -65,7 +65,7 @@ template_dependencies = [testing_assets_dir / "tst.py"]
 # copy dict as a template, do not modify
 autograder = {
     "name": None,     # replace
-    "setup": "sudo -H pip3 install pytest",        # default environment
+    "setup": "sudo -H pip3 install pytest numpy",  # default environment
     "run": "pytest --tb=line tests/test_NAME.py",  # replace tests/test_NAME.py
     "input": "",
     "output": "",
