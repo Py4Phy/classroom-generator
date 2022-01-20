@@ -375,7 +375,11 @@ hw00/
   directory.
   
 - Add a `README.md` file that will be displayed when browsing the
-  repository. It should contain the badges that show points.
+  repository. It should contain the badges that show points:
+  
+  ```markdown
+  [![GitHub Classroom Workflow](../../workflows/GitHub%20Classroom%20Workflow/badge.svg?branch=main)](../../actions/workflows/classroom.yml) ![Points badge](../../blob/badges/.github/badges/points.svg)
+  ```
   
 - Add additional documents (as .md or .pdf files) to describe the
   task.
