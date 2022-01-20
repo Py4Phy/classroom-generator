@@ -243,13 +243,6 @@ def create_autograder_json(tests_list, directory):
 if __name__ == "__main__":
     import argparse
 
-    # at the moment MUST be run in the directory that contains
-    # generate.yml
-
-    # TODO
-    # - make `filename` an optional argumentm default to ./generate.yml
-    # - use different location for BUILD (outside repo by default!) and make it a kwarg
-
     parser = argparse.ArgumentParser(description="Generate files to be used with GitHub Classroom.",
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("filename", nargs="?",
@@ -272,6 +265,7 @@ if __name__ == "__main__":
     build_test_dir = build_dir / "tests"
     test_dir = pathlib.Path("tests")  # relative to the build root from where pytest is invoked
 
+    # keep output because BUILD_all.sh greps it for BUILD_DIR: ... yes, it's dirty
     print(f"assignment: {problemset['name']}")
     print(f"topdir: {topdir}")
     print(f"configfile: {configfile}")

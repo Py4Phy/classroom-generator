@@ -39,30 +39,50 @@ Make sure to include the points banner.
 
 Create any starter code.
 
-Currently, the `BUILD_all.sh` script only copies `*.py` files at the top level.
+Currently, the `BUILD_all.sh` script only copies `*.py` and `*.ipynb` files at the top level.
 
+### Simple usage
 
-### Generating tests
+Run the `BUILD_all.sh` script as
+
+```bash
+BUILD_all.sh -B /tmp/BUILD hw00/generate.yml
+```
+
+where `-B` is the path to where you want the final repository with
+tests to show up under and the argument is the path to the
+configuration yml file.
+
+The shell script
+
+1. calls `generate_tests.py  -B $BUILD generate.yml`
+2. copies files to the final destination directory
+3. initializes a git repo there and/or commits changes
+
+You can then push the repo to a remote repository that can be used as
+a template for GitHub Classroom.
+
+### Only generating tests
+
+The `generate_tests.py` script can be also run separately, e.g., for
+testing.
 
 Tests are generated in the BUILD directory, typically `BUILD/<name>`
 where `<name>` is generated from the assignment title in
 **problemset.name** in the `generate.yml` file (after making the name
 "shell"-safe); we will refer to it as `$BUILD`.
 
-1. cd to the top directory that contains `generate.yml` 
-2. run `generate_tests.py`, which creates `$BUILD` with the tests
+```
+generate_tests.py -B $BUILD path/to/hw00/generate.yml
+```
 
 See [below](#input-file) for notes on `generate.yml`
 
 All necessary files are copied into the `$BUILD` directory. 
 
-### Final assembly
+### Notes on BUILD_all
 
-Use the
-
-    ../bin/BUILD_all BUILD/<name>
-
-script, which does the following:
+The `BUILD_all.sh` script does the following:
 
 - copy `assignment.md` to `$BUILD` and symlink as `README.md`
 - copy assignment assets to `$BUILD`
@@ -293,25 +313,13 @@ problemset:
   unset should be fine in most cases.
 
 
-## Solutions
 
-Keep solutions in a `Solution` directory here for reference. They are
-not used anywhere. The `generate.yml` file needs to either contain the
-correct reference values or the custom tests need to contain the code
-to check for correctness.
+## Directory layout
 
+### classroom-generator
 
-
-## TODO
-- add commandline processing to script
-- documentation
-- separate Assignments and Participation into separate repository
-- add license and make classroom-generator public
-
-
-## Layout
-
-fixed directory structure
+The class-room generator needs the following fixed directory structure
+to find assets (relative to the `bin` directory):
 
 ```
 .
@@ -326,11 +334,57 @@ fixed directory structure
 │   │   └── tst.py
 │   └── workflows
 │       └── classroom.yml
-├── Assignments
-│   ├── ...
-│   └── hw03
-│       └── generate.yml
 └── bin
     ├── BUILD_all.sh
     └── generate_tests.py
 ```
+
+### Assignments
+
+Assignments are stored separately but also need to have a fixed
+layout:
+
+```
+hw00/
+├── README.md
+├── Solution
+│   ├── hello.py
+│   └── planets
+│       └── iceplanets
+│           └── hoth.txt
+├── assignment_00.md
+├── generate.yml
+├── hello.py
+└── tests
+	├── test_files_and_directories.py
+	└── test_helloworld.py
+```
+
+- The `generate.yml` file is the config file and drives the
+  classroom-generator script `generate_tests.py`.
+
+  It defines the top level directory for an assignment.
+  
+- The `tests` directory *must* be in the top directory. It contains
+  custom tests that will be copied into the full problem directory.
+
+- Starter code such as `hello.py`  is put in the top
+  directory.
+  
+- Add a `README.md` file that will be displayed when browsing the
+  repository. It should contain the badges that show points.
+  
+- Add additional documents (as .md or .pdf files) to describe the
+  task.
+  
+- Keep solutions in a `Solution` directory for reference. They are not
+  used anywhere. The `generate.yml` file needs to either contain the
+  correct reference values or the custom tests need to contain the
+  code to check for correctness.
+  
+  **Keep assignment template repositories private if they contain
+  solutions.**
+  
+
+## TODO
+- documentation
