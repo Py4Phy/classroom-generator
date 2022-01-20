@@ -32,29 +32,33 @@ do
 done
 shift $(($OPTIND - 1))
 
-SRCDIR="$1"
+CONFIG="$1"
+SRCDIR=$(dirname "${CONFIG}")
 : "${BUILD:=${SRCDIR}/BUILD}"
 
 echo "## $0 ($(date))"
+echo ".. CONFIG = $CONFIG"
 echo ".. SRCDIR = $SRCDIR"
 echo ".. BUILD = $BUILD"
 
+test -n "${CONFIG}" || die "missing YML config file"
+test -d "${SRCDIR}" || die "no SRCDIR ${SRCDIR} for ${CONFIG}" 2
 
 # generator script decides on the name of the directory so we grep it
 # from the output
-echo ">> generate_tests.py --build-dir ${BUILD} ${SRCDIR}"
-dest_dir=$("${BINDIR}/generate_tests.py" --build-dir "${BUILD}" "${SRCDIR}" | awk '/^BUILD_DIR:/ {printf $2}')
+echo ">> generate_tests.py --build-dir ${BUILD} ${CONFIG}"
+dest_dir=$("${BINDIR}/generate_tests.py" --build-dir "${BUILD}" "${CONFIG}" | awk '/^BUILD_DIR:/ {printf $2}')
 test -n "${dest_dir}"  || die "generator script failed"
 test -d "${dest_dir}" || die "generated files are missing: no directory ${dest_dir}" 2
 
 echo "## Finalizing repo in ${dest_dir}"
 
-cp -v README.md assignment*.md assignment*.pdf tex/*.pdf "${dest_dir}"
-cp -v *.csv *.txt "${dest_dir}"
-cp -v *.py *.ipynb "${dest_dir}"
+cp -v ${SRCDIR}/README.md ${SRCDIR}/assignment*.md ${SRCDIR}/assignment*.pdf ${SRCDIR}/tex/*.pdf "${dest_dir}"
+cp -v ${SRCDIR}/*.csv ${SRCDIR}/*.txt "${dest_dir}"
+cp -v ${SRCDIR}/*.py ${SRCDIR}/*.ipynb "${dest_dir}"
 # Should not need to copy tests: use test_assets: ["conftest.py", ...] at top.
 #test -d tests && rsync -avP --exclude="__pycache__" --exclude="*~" tests "${dest_dir}"
-mkdir -p "${dest_dir}/.github/workflows" "${dest_dir}/.github/workflows/classroom"
+mkdir -p "${dest_dir}/.github/workflows" "${dest_dir}/.github/classroom"
 cp -v "${ASSETS}/workflows/classroom.yml" "${dest_dir}/.github/workflows"
 mv "${dest_dir}/autograding.json" "${dest_dir}/.github/classroom/"
 cp -v "${ASSETS}/students.gitignore" "${dest_dir}/.gitignore"
