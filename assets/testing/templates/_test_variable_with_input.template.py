@@ -18,5 +18,5 @@ def test_${name}():
                                      FILENAME,
                                      check_type=${check_type},
                                      rtol=${relative_tolerance},
-                                     atol=${absolute_tolerance}),
+                                     atol=${absolute_tolerance},
                                      )
