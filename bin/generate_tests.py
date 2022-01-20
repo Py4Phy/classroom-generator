@@ -10,7 +10,7 @@ import shutil
 import yaml
 import json
 
-# fixed diretcory structure
+# fixed directory structure
 # .
 # ├── README.md
 # ├── assets
@@ -23,13 +23,20 @@ import json
 # │   │   └── tst.py
 # │   └── workflows
 # │       └── classroom.yml
-# ├── Assignments
-# │   ├── ...
-# │   └── hw03
-# │       └── generate.yml
 # └── bin
 #     ├── ...
 #     └── generate_tests.py
+
+# templates for Assignments are in a repo with each
+# assignment in its own subdirectory and this script uses
+# the path to generate.yml at the root of the assignment dir
+# to find everything else.
+#
+# Assignments
+#     ├── ...
+#     └── hw03
+#         └── generate.yml
+
 
 ASSETS = pathlib.Path(__file__).parent / os.path.pardir / "assets"
 
@@ -110,21 +117,27 @@ def create_init_file(directory, comment):
 
 def create_subproblem(subproblem, problem_dir,
                       build_dir,
+                      topdir=pathlib.Path(os.path.curdir),
                       setup_command=autograder['setup'],
                       metadata=None,
                       pytest_args=None):
     """Build tests and metadata for a single subproblem.
+
+    Custom tests are taken from topdir/tests, other tests are generated.
 
     Parameters
     ----------
     subproblem : dict
                  data structure for an entry in *problems.items*
     problem_dir: pathlib.Path
-                 directory for the problem, relative to the root
+                 dest directory for the problem, relative to the root
                  (should include ``tests/...``); needs to be relative
                  to `build_dir`
     build_dir : pathlib.Path
                  directory where files are build (typically build_dir/)
+    topdir : pathlib.Path
+                 directory that contains "tests/" and generate.yml, default
+                 is the current dir "."
     setup_command : str
                  command for installing test environment; default is
                  ``autograder['setup']``.
@@ -190,9 +203,9 @@ def create_subproblem(subproblem, problem_dir,
         testfile.write_text(t)
         used_templates = True
     else:
-        # custom file: just copy
-        print(f".. Copy custom test {template}")
-        shutil.copy(template, testfile)
+        # custom file: just copy from the topdir/tests directory
+        print(f".. Copy custom test {topdir / template}")
+        shutil.copy(topdir / template, testfile)
         used_templates = False
 
     print(f"++ Created {testfile}... [{subproblem['points']}]")
@@ -228,17 +241,40 @@ def create_autograder_json(tests_list, directory):
 
 
 if __name__ == "__main__":
+    import argparse
 
-    filename = "generate.yml"
+    # at the moment MUST be run in the directory that contains
+    # generate.yml
 
-    cfg = yaml.load(open(filename), Loader=yaml.FullLoader)
+    # TODO
+    # - make `filename` an optional argumentm default to ./generate.yml
+    # - use different location for BUILD (outside repo by default!) and make it a kwarg
+
+    parser = argparse.ArgumentParser(description="Generate files to be used with GitHub Classroom.",
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("filename", nargs="?",
+                        default="generate.yml",
+                        help="classroom-generator yml file")
+    parser.add_argument("--build-dir", "-B",
+                        metavar="DIR",
+                        default="BUILD",
+                        help="directory to contain the generated directory; can exist already, in "
+                        "which case files will be overwritten")
+    args = parser.parse_args()
+
+    configfile = pathlib.Path(args.filename)
+    topdir = configfile.parent
+
+    cfg = yaml.load(open(configfile), Loader=yaml.FullLoader)
     problemset = cfg['problemset']
 
-    build_dir = pathlib.Path("BUILD") / make_safe_filename(problemset['name'])
+    build_dir = pathlib.Path(args.build_dir) / make_safe_filename(problemset['name'])
     build_test_dir = build_dir / "tests"
     test_dir = pathlib.Path("tests")  # relative to the build root from where pytest is invoked
 
     print(f"assignment: {problemset['name']}")
+    print(f"topdir: {topdir}")
+    print(f"configfile: {configfile}")
     print(f"BUILD_DIR: {build_dir}")
     print(f"test_dir: {build_test_dir}")
 
@@ -289,6 +325,7 @@ if __name__ == "__main__":
             # special setup (define per problem but needs to be specified per test for autograder)
             ag, sub_used_templates = create_subproblem(subproblem, problem_dir,
                                                        build_dir,
+                                                       topdir=topdir,
                                                        setup_command=problem.get('setup', default_setup),
                                                        metadata=metadata)
             tests_list.append(ag)
