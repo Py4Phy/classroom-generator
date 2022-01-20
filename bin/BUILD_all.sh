@@ -47,7 +47,11 @@ test -d "${SRCDIR}" || die "no SRCDIR ${SRCDIR} for ${CONFIG}" 2
 # generator script decides on the name of the directory so we grep it
 # from the output
 echo ">> generate_tests.py --build-dir ${BUILD} ${CONFIG}"
-dest_dir=$("${BINDIR}/generate_tests.py" --build-dir "${BUILD}" "${CONFIG}" | awk '/^BUILD_DIR:/ {printf $2}')
+logfile=$(mktemp -t generate_test_output)
+"${BINDIR}/generate_tests.py" --build-dir "${BUILD}" "${CONFIG}" 2>&1 | tee $logfile || die "generate_tests failed" $?
+dest_dir=$(awk '/^BUILD_DIR:/ {printf $2}' $logfile)
+rm $logfile
+
 test -n "${dest_dir}"  || die "generator script failed"
 test -d "${dest_dir}" || die "generated files are missing: no directory ${dest_dir}" 2
 

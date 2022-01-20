@@ -278,9 +278,9 @@ if __name__ == "__main__":
     # custom global assets
     for filename in problemset.get('test_assets', []):
         # find test assets under tests/
-        asset_path = "tests" / pathlib.Path(filename)
+        asset_path = topdir / "tests" / filename
         shutil.copy(asset_path, build_test_dir)
-        print(f"+ Copied {asset_path} --> {build_test_dir}")
+        print(f"+ Copied custom test_asset {asset_path} --> {build_test_dir}")
 
     # make it a package for relative imports
     create_init_file(build_test_dir, f"tests for {problemset['name']}")
