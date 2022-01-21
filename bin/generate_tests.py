@@ -204,7 +204,7 @@ def create_subproblem(subproblem, problem_dir,
         used_templates = True
     else:
         # custom file: just copy from the topdir/tests directory
-        print(f".. Copy custom test {topdir / template}")
+        print(f"++ Copy custom test {topdir / template}")
         shutil.copy(topdir / template, testfile)
         used_templates = False
 
@@ -238,6 +238,34 @@ def create_autograder_json(tests_list, directory):
 
     print(f"+ Created '{ag_json}'")
     return ag_json
+
+def copy_assets(names, dest_dir, topdir=pathlib.Path(os.curdir)):
+    """Copy all entries in list names to directory dest_dir.
+
+    Files/directories in names are looked for under topdir.
+    """
+    topdir = pathlib.Path(topdir)
+    for name in names:
+        # find assets under topdir
+        asset_path = topdir / name
+        if asset_path.is_dir():
+            newdir = dest_dir / asset_path.parts[-1]
+
+            # only copytree >= 3.8 has dirs_exist_ok=True so just nuke the target first...
+            if newdir.absolute() == topdir.absolute():
+                raise ValueError("asset '{name}' cannot be the top directory {topdir}")
+            elif newdir.absolute() == dest_dir.absolute():
+                raise ValueError("asset '{name}' cannot be the destination directory {dest_dir}")
+            if newdir.exists():
+                shutil.rmtree(newdir)
+                print(f"+ Removed {newdir} to prepare for a fresh copy of asset {name}")
+
+            shutil.copytree(asset_path, newdir, symlinks=True)
+            operation = "Recursively copied"
+        else:
+            shutil.copy2(asset_path, dest_dir)
+            operation = "Copied"
+        print(f"+ {operation} custom asset {asset_path} --> {dest_dir}")
 
 
 if __name__ == "__main__":
@@ -276,11 +304,10 @@ if __name__ == "__main__":
     build_test_dir.mkdir(parents=True, exist_ok=True)
 
     # custom global assets
-    for filename in problemset.get('test_assets', []):
-        # find test assets under tests/
-        asset_path = topdir / "tests" / filename
-        shutil.copy(asset_path, build_test_dir)
-        print(f"+ Copied custom test_asset {asset_path} --> {build_test_dir}")
+    copy_assets(problemset.get('test_assets', []), build_test_dir,
+                topdir=topdir / "tests")
+    copy_assets(problemset.get('assets', []), build_dir,
+                topdir=topdir)
 
     # make it a package for relative imports
     create_init_file(build_test_dir, f"tests for {problemset['name']}")
@@ -305,6 +332,11 @@ if __name__ == "__main__":
                     'problem': problem['problem'],
                     'filename': problem['filename'],
                     }
+
+        # copy problem-specific assets
+        copy_assets(problem.get('assets', []), build_dir,
+                    topdir=topdir)
+
         problem_dir = test_dir / pathlib.Path(
             make_safe_filename(f"problem_{problem['problem']}"))
         build_problem_dir = build_dir / problem_dir

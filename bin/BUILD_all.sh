@@ -49,6 +49,7 @@ test -d "${SRCDIR}" || die "no SRCDIR ${SRCDIR} for ${CONFIG}" 2
 echo ">> generate_tests.py --build-dir ${BUILD} ${CONFIG}"
 logfile=$(mktemp -t generate_test_output)
 "${BINDIR}/generate_tests.py" --build-dir "${BUILD}" "${CONFIG}" 2>&1 | tee $logfile || die "generate_tests failed" $?
+# WARNING: next line breaks if BUILD_DIR contains spaces (due to white-space splitting and $2)...
 dest_dir=$(awk '/^BUILD_DIR:/ {printf $2}' $logfile)
 rm $logfile
 
@@ -57,11 +58,9 @@ test -d "${dest_dir}" || die "generated files are missing: no directory ${dest_d
 
 echo "## Finalizing repo in ${dest_dir}"
 
-cp -v ${SRCDIR}/README.md ${SRCDIR}/assignment*.md ${SRCDIR}/assignment*.pdf ${SRCDIR}/tex/*.pdf "${dest_dir}"
-cp -v ${SRCDIR}/*.csv ${SRCDIR}/*.txt "${dest_dir}"
-cp -v ${SRCDIR}/*.py ${SRCDIR}/*.ipynb "${dest_dir}"
-# Should not need to copy tests: use test_assets: ["conftest.py", ...] at top.
-#test -d tests && rsync -avP --exclude="__pycache__" --exclude="*~" tests "${dest_dir}"
+## all assets are listed in generate.yml and are copied with generate_tests.py
+## Use assets: ["README.md", ...] at top level and assets: ["data.csv", "startercode.py"] at the problem level
+
 mkdir -p "${dest_dir}/.github/workflows" "${dest_dir}/.github/classroom"
 cp -v "${ASSETS}/workflows/classroom.yml" "${dest_dir}/.github/workflows"
 mv "${dest_dir}/autograding.json" "${dest_dir}/.github/classroom/"
