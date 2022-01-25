@@ -61,11 +61,14 @@ echo "## Finalizing repo in ${dest_dir}"
 ## all assets are listed in generate.yml and are copied with generate_tests.py
 ## Use assets: ["README.md", ...] at top level and assets: ["data.csv", "startercode.py"] at the problem level
 
-mkdir -p "${dest_dir}/.github/workflows" "${dest_dir}/.github/classroom"
-cp -v "${ASSETS}/workflows/classroom.yml" "${dest_dir}/.github/workflows"
-mv "${dest_dir}/autograding.json" "${dest_dir}/.github/classroom/"
-cp -v "${ASSETS}/students.gitignore" "${dest_dir}/.gitignore"
+mkdir -p "${dest_dir}/.github/workflows" "${dest_dir}/.github/classroom" && echo ">> mkdir -p .github/{workflows,classroom}"
+cp "${ASSETS}/workflows/classroom.yml" "${dest_dir}/.github/workflows" && echo ">> cp ASSETS/workflows/classroom.yml .github/workflows"
+mv "${dest_dir}/autograding.json" "${dest_dir}/.github/classroom/" && echo ">> mv autograding.json .github/classroom"
+cp "${ASSETS}/students.gitignore" "${dest_dir}/.gitignore" && echo ">> cp ASSETS/students.gitignore .gitignore"
 
-(cd "${dest_dir}" && test -d .git ||  { git init && git add -A . && git commit -m "initialized assignment"; } && { git add -A . && git commit -m "updated assignment"; })
+echo ">> git: setting up and committing files in ${dest_dir}"
+(cd "${dest_dir}" && test -d .git \
+	 || { git init && git add -A . && git commit -m "initialized assignment"; } \
+	 && { git add -A . && git commit -m "updated assignment"; })
 
 echo "## completed ${dest_dir}"
