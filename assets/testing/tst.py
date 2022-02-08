@@ -6,6 +6,8 @@ import sys
 from io import StringIO
 import subprocess
 import re
+import base64
+import zlib
 
 import numpy as np
 import numpy.testing as nptst
@@ -157,3 +159,11 @@ def _test_filecontent(filename, reference, regex=True):
         m = reference in output
         match_pattern = "contain text"
     assert m, f"'In file {filename}': output\n\n{output}\n\ndid not {match_pattern}\n\n{reference}\n\n"
+
+
+def dzb64b16(s):
+    """Decode obfuscated code in bytes s.
+
+    Run with exec(dzb64b16(s))
+    """
+    return zlib.decompress(base64.b16decode(s))
