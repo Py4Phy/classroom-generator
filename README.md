@@ -20,6 +20,7 @@ At the moment the following is supported:
 - template test for comparing output against regular expression
 - template test for checking existence of an image file
 - template test for checking existence of a file
+- template test for checking existence of at least one file matching a regular expression
 - template test for multiline regular expression match for file content
 - template test for function evaluation (parametrized, always provide args/kwargs/references as a list of lists or list of dicts)
 - custom test files
@@ -337,6 +338,11 @@ problemset:
       points: 1
       content: |
          \s*energy\s*conservation
+  - problem: 5
+    title: data analysis
+	- name: produce numbered data files
+	  points: 3
+	  fileregex: "datafiles/data_\d+\.(dat|csv)"
 
 ``` 
           
@@ -461,7 +467,20 @@ additional keys as described in the documentation below.
   (e.g., when first line is indented compared to following lines).
 
 * **file**: name of a file that should have been submitted;
-  the test only checks that the file exists.
+  the test only checks that the file exists. 
+  
+  A path relative to the repository root directory can be used.
+
+ **fileregex**: Python regular expression for one or more
+  filenames. If the expression matches at least one filename then the
+  test passes.
+  
+  Directory names do *not* count as matches.
+  
+  The **fileregex** can be a path including directory names relative
+  to the repository root directory. However, regular expressions may
+  *only be used for the filename part* as directory parts of the path
+  are never matched but used literally.
 
 * **imagefilename**: name of a file that should have been submitted;
   the test only checks that the file exists and that it can be loaded

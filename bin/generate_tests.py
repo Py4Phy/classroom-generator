@@ -52,6 +52,8 @@ templates = {'variable':
              string.Template((templatedir / '_test_output.template.py').read_text()),
              'file':
              string.Template((templatedir / '_test_file.template.py').read_text()),
+             'fileregex':
+             string.Template((templatedir / '_test_fileregex.template.py').read_text()),
              'imagefile':
              string.Template((templatedir / '_test_imagefile.template.py').read_text()),
              'content':
@@ -86,6 +88,8 @@ def choose_template(problem):
         return templates['content']
     elif 'file' in problem:
         return templates['file']
+    elif 'fileregex' in problem:
+        return templates['fileregex']
     elif 'imagefilename' in problem:
         return templates['imagefile']
     elif 'function' in problem:
@@ -326,11 +330,11 @@ if __name__ == "__main__":
     # running total of points
     points_total = 0
 
-    for problem in problemset['problems']:
-        print(f"= problem: {problem['problem']} in file '{problem['filename']}'")
+    for problem in problemset.get('problems', []):
+        print(f"= problem: {problem['problem']} in file '{problem.get('filename')}'")
         metadata = {'assignment': problemset['name'],
                     'problem': problem['problem'],
-                    'filename': problem['filename'],
+                    'filename': problem.get('filename', ""),
                     }
 
         # copy problem-specific assets
@@ -357,6 +361,9 @@ if __name__ == "__main__":
             tests_list.append(ag)
             used_templates = used_templates or sub_used_templates
             points_total += subproblem['points']
+
+    if points_total == 0:
+        print("WW WARNING: total points is ZERO: did you include a 'problemset' list?")
 
     # copy standard test assets if needed
     if used_templates:

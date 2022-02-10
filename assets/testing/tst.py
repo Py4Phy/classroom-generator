@@ -2,6 +2,7 @@
 import pytest
 import importlib
 import pathlib
+import os
 import sys
 from io import StringIO
 import subprocess
@@ -81,6 +82,26 @@ def _test_file(p):
     p = pathlib.Path(p)
     if not p.exists():
         raise AssertionError(f"Solution file '{p}' is missing.")
+
+def _test_fileregex(pattern, directory=os.curdir):
+    """Regular expression filename matching.
+
+    Test all files in directory (relative to the top dir of the
+    repository) and succeed if one filename matches.
+
+    If the pattern contains a path then files are looked for in the
+    deepest directory in the path. the pattern can *only* contain
+    regular expression for the file name and NOT the parent directory
+    names.
+
+    pattern: regular expression
+
+    """
+    p_pattern = pathlib.PurePath(pattern)
+    parent = pathlib.Path(directory) / p_pattern.parent
+    filepattern = p_pattern.name
+    matches = [bool(re.match(filepattern, p.name)) for p in parent.iterdir() if p.is_file()]
+    assert any(matches), f"No files matching pattern '{filepattern}' present in directory '{parent}'"
 
 def _test_imagefile(p):
     p = pathlib.Path(p)
