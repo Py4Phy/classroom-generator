@@ -261,7 +261,7 @@ verbatim. Whole directories can also be copied.
 
 ### Configuration
 
-Include any starter code filen ames or directory names in the
+Include any starter code filenames or directory names in the
 **problem.assets**.
 
 For example:
@@ -455,13 +455,14 @@ problemset:
 
 * Starter code `*.py`, assignment sheet (`*.{pdf,md}`) etc are copied
   *to the top* of the template directory; if you want directory trees,
-  put them in a directory and list the directory in **assets* because
+  put them in a directory and list the directory in **assets** because
   trees are copied as-is.
 
 * Be careful about how yaml interprets data; for instance,
   scientific/engineering notation is only understood when a decimal
   point is included an a sign after 'e': 1.e+1 (good), 1e+1 (bad),
-  1.e1 (bad) --- the bad cases are interpreted as *strings*
+  1.e1 (bad) --- the bad cases are interpreted as *strings*. See the
+  [pyyaml documentation](https://pyyaml.org/wiki/PyYAMLDocumentation).
 
 ### Keys in `generate.yml`
 
