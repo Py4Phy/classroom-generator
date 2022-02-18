@@ -8,7 +8,13 @@ that contains the individual tests with points. The
 `generate_tests.py` script then creates
 
 - the appropriate tests themselves
-- the `autograding.json` configuration for the `.github/workflows/classroom/autograding.json`
+- the `autograding.json` configuration for the
+  `.github/workflows/classroom/autograding.json`
+  (The [py4phy/autograding@v1.1](https://github.com/Py4Phy/autograding)
+  workflow is used; this is a fork of
+  [stevenbitner/autograding](https://github.com/stevenbitner/autograding),
+  @stevenbitner 's updated version of the original GitHub
+  [education/autograding](https://github.com/education/autograding) workflow)
 
 The `generate.yml` file contains data for problems with their individual
 tests. For each problem, a subdirectory is made under `tests/`. Each test
@@ -339,7 +345,8 @@ problemset:
       content: |
          \s*energy\s*conservation
   - problem: 5
-    title: data analysis
+    title: data analysis (BONUS)
+    extra: true	
 	- name: produce numbered data files
 	  points: 3
 	  fileregex: "datafiles/data_\d+\.(dat|csv)"
@@ -424,6 +431,16 @@ Each problem contains one or more tests.
   runs in a fresh environment, and counts as a separate test for the
   autograder.
 
+* **extra**: Set to `True` if this problem counts as extra credit (or
+  bonus). The default is `False`. Points for extra credit are
+  accrued but the total is listed as the sum of points without any
+  extra credit. The green *passing* badge is added as soon as the
+  regular point total is reached.
+  
+  Using this flag requires the special
+  [py4phy/autograding@v1.1](https://github.com/Py4Phy/autograding)
+  workflow.
+
 #### Individual tests
 
 The philosophy is to have one test per property that is to be tested.
@@ -433,6 +450,19 @@ The philosophy is to have one test per property that is to be tested.
 
 * **points**: Each test has a **points** value. A failed test is 0
   points, a passed test accrues the points value.
+  
+  Test that are part of problems with **extra:** `True` can fail/pass
+  as usual but the **points** are *not* included in the point total for
+  the full problem set.
+
+* **extra**: Set to `True` if this test counts as extra credit (or
+  bonus). The default is `False`. See the notes on **extra** for the
+  whole problem.
+  
+  The values of **extra** at the problem and the test level are
+  combined with logical `or` so that if *any* of them are set to
+  `True` then the test will count as extra credit.
+
 
 ##### Available tests
 

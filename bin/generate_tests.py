@@ -73,7 +73,8 @@ autograder = {
     "output": "",
     "comparison": "included",
     "timeout": 1,
-    "points": None    # replace
+    "points": None,   # replace
+    "extra": False,   # extra credit flag (requires workflow py4phy/autograding@v1.1)
 }
 
 
@@ -123,6 +124,7 @@ def create_subproblem(subproblem, problem_dir,
                       build_dir,
                       topdir=pathlib.Path(os.path.curdir),
                       setup_command=autograder['setup'],
+                      extra=False,
                       metadata=None,
                       pytest_args=None):
     """Build tests and metadata for a single subproblem.
@@ -145,6 +147,15 @@ def create_subproblem(subproblem, problem_dir,
     setup_command : str
                  command for installing test environment; default is
                  ``autograder['setup']``.
+    extra : bool
+                 declare problem to be extra credit (``True``) or required
+                 (``False``). The default is ``False``. If the test itself
+                 (in `subproblem`) is marked as ``extra=True`` then the
+                 state is determined by ``extra or subproblem['extra']``,
+                 i.e., if any of these is ``True`` then the test is marked
+                 as a extra credit/bonus.
+
+                 Use of `extra` requires the py4phy/autograding@v1.1 workflow.
     metadata : dict
                  data for the whole problem (assignment, problem, filename)
     pytest_args : str
@@ -165,6 +176,10 @@ def create_subproblem(subproblem, problem_dir,
     print(f"== subproblem: {subproblem['name']}  points: {subproblem['points']}")
     subs = subproblem.copy()
     subs['name'] = make_safe_filename(subproblem['name'])
+    extra_credit = extra or subproblem.get('extra', False)
+    if extra_credit:
+        print(f".. EXTRA CREDIT test because extra={extra_credit} in config.")
+
     subs.setdefault('check_type', False)
     subs.setdefault('relative_tolerance', None)  # use pytest.approx() defaults
     subs.setdefault('absolute_tolerance', None)  # use pytest.approx() defaults
@@ -221,6 +236,15 @@ def create_subproblem(subproblem, problem_dir,
     ag['points'] = subproblem['points']
     ag['run'] = f"pytest {subs['pytest_args']} {problem_dir / testfilename}"
     ag['setup'] = setup_command
+    # only include extra if True (maximum backwards compatibility with
+    # education/autograding workflow)
+    if not extra_credit:
+        try:
+            del ag['extra']
+        except KeyError:
+            pass
+    else:
+        ag['extra'] = extra_credit
 
     print(f"++ Created entry for autograder: {ag['name']}: {ag['run']}")
 
@@ -357,6 +381,7 @@ if __name__ == "__main__":
                                                        build_dir,
                                                        topdir=topdir,
                                                        setup_command=problem.get('setup', default_setup),
+                                                       extra=problem.get('extra', False),
                                                        metadata=metadata)
             tests_list.append(ag)
             used_templates = used_templates or sub_used_templates

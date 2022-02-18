@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0             # otherwise, you will failed to push refs to dest repo
 
       # add id to step so outputs can be referenced
-      - uses: education/autograding@v1
+      - uses: py4phy/autograding@v1.1
         id: autograder
         continue-on-error: true
         env:
@@ -62,4 +62,4 @@ jobs:
       # fail job if autograder returns failed
       - name: check autograder pass fail
         if: ${{ steps.autograder.outcome != 'success' }}
-        run: exit 1
+        run: echo "Not all tests in py4phy/autograding@v1.1 passed" && exit 1
