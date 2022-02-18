@@ -346,10 +346,10 @@ problemset:
          \s*energy\s*conservation
   - problem: 5
     title: data analysis (BONUS)
-    extra: true	
-	- name: produce numbered data files
-	  points: 3
-	  fileregex: "datafiles/data_\d+\.(dat|csv)"
+    extra: True
+    - name: produce numbered data files
+      points: 3
+      fileregex: "datafiles/data_\d+\.(dat|csv)"
 
 ``` 
           
