@@ -38,6 +38,104 @@ immediately pushed to an empty template repository on GitHub.
 All code and files are made available under the terms of the [GNU
 General Public License v3](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
+## Tutorial
+
+In this mini-tutorial we will create a Classroom assignment for simple in-class
+exercises with NumPy and matplotlib. All materials are publicly
+available at https://github.com/Py4Phy .
+
+We will use
+[Py4Phy/activity_04_source](https://github.com/Py4Phy/activity_04_source)
+as input (normally, students would likely not see this repository
+because I am including the solutions there). The generated template
+repository with the files for the GitHub actions autograding workflow
+is
+[Py4Phy/Activity_04_numpy_and_matplotlib](https://github.com/Py4Phy/Activity_04_numpy_and_matplotlib).
+
+
+### Get classroom-generator
+You need a Python environment with the pyyaml package included.
+
+Currently, no real installation is provided. Just clone the repo:
+```
+git clone https://github.com/Py4Phy/classroom-generator.git
+```
+Then use the scripts in the `classroom-generator/bin` directory.
+
+### Get the example sources
+Clone the
+[Py4Phy/activity_04_source](https://github.com/Py4Phy/activity_04_source)
+repository:
+
+```
+git clone https://github.com/Py4Phy/activity_04_source.git
+```
+
+### Create the template repository for GitHub Classroom
+
+We first build the template locally in a directory `templates`:
+```
+mkdir templates
+```
+Run classroom-generator's `BUILD_all.sh` script:
+```
+./classroom-generator/bin/BUILD_all.sh -B templates/activity_04_numpy/generate.yml
+```
+
+The new template repo is created as
+**templates/Activity_04_numpy_and_matplotlib**. During this process,
+files are copied and new tests are created. An input file for the
+autograding workflow is generated and moved to the right
+place. Finally, everything is turned into a local git repository and
+checked in. Note that running the process again  will add commits to
+the repo (if anything changed).
+
+### Push template repo to GitHub
+
+Now **create a new repository on GitHub named
+Activity_04_numpy_and_matplotlib** under YOURORG or YOURNAME.
+
+Push changes from the **local** Activity_04_numpy_and_matplotlib.git
+repo to the remote:
+```
+git remote add origin git@github.com:YOURORG/Activity_04_numpy_and_matplotlib.git
+git branch -M main
+git push -u origin main
+```
+
+**Set the remote to be a template** under the Settings. (IMPORTANT:
+Otherwise GitHub Classroom cannot use it!)
+
+Your remote template repository should look like
+[Py4Phy/Activity_04_numpy_and_matplotlib](https://github.com/Py4Phy/Activity_04_numpy_and_matplotlib).
+
+
+### Set up an assignment in Classroom
+In [GitHub Classroom](classroom.github.com/) create a **New
+Assignment** with the following settings:
+
+* Assignment basics
+  * Assignment Title: *activity-04* (or whatever you want to call it)
+  * Deadline: (choose one if you like)
+  * Individual or group assignment: Individual assignment
+  * Repository visibility: *Private*
+  * Grant students admin access to their repository: no (recommended,
+    but your choice)
+* Starter code and environment
+  * Add a template repository to give students starter code:
+    **YOURORG/Activity_04_numpy_and_matplotlib**
+  * Add a supported editor: (your choice)	
+* Grading and feedback
+  * Add autograding tests: **leave empty** (do NOT add tests here as
+    this will overwrite your generated configuration!)
+  * Enable feedback pull requests: (your choice)
+  
+Then **Create assignment**.
+
+Distribute the magic link to your students.
+
+
+
 ## Usage
 
 Primitive at the moment... 
