@@ -97,6 +97,7 @@ def _test_fileregex(pattern, directory=os.curdir):
     pattern: regular expression
 
     """
+    # Needs to be tested on Windows, esp. p_pattern.parent might fail with '\'
     p_pattern = pathlib.PurePath(pattern)
     parent = pathlib.Path(directory) / p_pattern.parent
     filepattern = p_pattern.name
