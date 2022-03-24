@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # base64 and zcompress encode file
 # see https://stackoverflow.com/a/28573360
 
