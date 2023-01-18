@@ -151,6 +151,9 @@ def _test_variable_with_input(name, input_values, reference, mod, **kwargs):
     assert_variable(name, value, reference, **kwargs)
 
 def _test_output(filename, reference, input_values=None, regex=True):
+    # make output more understandable by explicitly guarding against missing files
+    _test_file(filename)
+
     input_values = "\n".join([str(s) for s in input_values]) + "\n" if input_values is not None else None
     output = subprocess.check_output([PYTHON, filename], input=input_values, universal_newlines=True, encoding="utf-8")
     if regex:
