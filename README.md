@@ -79,7 +79,7 @@ mkdir templates
 ```
 Run classroom-generator's `BUILD_all.sh` script:
 ```
-./classroom-generator/bin/BUILD_all.sh -B templates/activity_04_numpy/generate.yml
+./classroom-generator/bin/BUILD_all.sh -B templates activity_04_source/generate.yml
 ```
 
 The new template repo is created as
