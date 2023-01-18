@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0             # otherwise, you will failed to push refs to dest repo
 
       # add id to step so outputs can be referenced
-      - uses: py4phy/autograding@v1
+      - uses: py4phy/autograding@v1.1.1
         name: autograding
         id: autograder
         continue-on-error: true
@@ -37,7 +37,7 @@ jobs:
 
       # make points badge
       - name: points badge
-        uses: emibcn/badge-action@v2
+        uses: emibcn/badge-action@v2.0.2
         with:
           label: 'Points'
           status: '${{ steps.autograder.outputs.Points }}'
