@@ -19,7 +19,7 @@ jobs:
 
       # add id to step so outputs can be referenced
       - uses: py4phy/autograding@v1
-        name: Autograding
+        name: autograding
         id: autograder
         continue-on-error: true
         env:
@@ -64,4 +64,4 @@ jobs:
       # fail job if autograder returns failed
       - name: check autograder pass fail
         if: ${{ steps.autograder.outcome != 'success' }}
-        run: echo "Not all tests in py4phy/autograding@v1.1 passed" && exit 1
+        run: echo "Not all tests in autograding passed" && exit 1
