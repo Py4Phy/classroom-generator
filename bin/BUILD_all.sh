@@ -6,6 +6,10 @@ BINDIR="${TOPDIR}/bin"
 
 E_OPTERROR=85
 
+BUILD=""
+MESSAGE="updated assignment"
+
+
 USAGE="$0 [-B BUILDIR] SRCDIR
 
 Run the classroom-generator in SRCDIR and copy
@@ -14,6 +18,8 @@ all files to a repository under BUILDIR.
 The default for BUILDIR is SRCDIR/BUILD.
 
 -B DIR         build directory, e.g., /tmp/BUILD/
+-m STRING      git commit message
+               ['${MESSAGE}']
 "
 
 function die () {
@@ -21,11 +27,11 @@ function die () {
     exit 1;
 }
 
-BUILD=""
-while getopts "B:h" Option
+while getopts "B:m:h" Option
 do
     case $Option in
 	B) BUILD="$OPTARG";;
+	m) MESSAGE="$OPTARG";;
 	h) echo "$USAGE"; exit 0;;
 	*) die "unknown option" $E_OPTERROR;;
     esac
@@ -69,6 +75,6 @@ cp "${ASSETS}/students.gitignore" "${dest_dir}/.gitignore" && echo ">> cp ASSETS
 echo ">> git: setting up and committing files in ${dest_dir}"
 (cd "${dest_dir}" && test -d .git \
 	 || { git init && git add -A . && git commit -m "initialized assignment"; } \
-	 && { git add -A . && git commit -m "updated assignment"; })
+	 && { git add -A . && git commit -m "${MESSAGE}"; })
 
 echo "## completed ${dest_dir}"
