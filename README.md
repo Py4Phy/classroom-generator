@@ -10,7 +10,7 @@ that contains the individual tests with points. The
 - the appropriate tests themselves
 - the `autograding.json` configuration for the
   `.github/workflows/classroom/autograding.json`
-  (The [py4phy/autograding@v1.1](https://github.com/Py4Phy/autograding)
+  (The [py4phy/autograding@v1](https://github.com/Py4Phy/autograding)
   workflow is used; this is a fork of
   [stevenbitner/autograding](https://github.com/stevenbitner/autograding),
   @stevenbitner 's updated version of the original GitHub
