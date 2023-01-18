@@ -37,11 +37,11 @@ jobs:
 
       # make points badge
       - name: points badge
-        uses: emibcn/badge-action@v1
+        uses: emibcn/badge-action@v2
         with:
-          LABEL: 'Points'
-          STATUS: ${{ steps.autograder.outputs.Points }}
-          COLOR: cyan
+          label: 'Points'
+          status: '${{ steps.autograder.outputs.Points }}'
+          color: 'cyan'
           path: '.github/badges/points.svg'
 
       # commit and push badge if score has changed
